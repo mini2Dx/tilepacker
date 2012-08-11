@@ -54,6 +54,7 @@ public class TilePacker extends BasicGame {
 						if(!tileset.add(tile)) {
 							tilesets.add(tileset);
 							tileset = new Tileset();
+							tileset.add(tile);
 						}
 					}
 				}

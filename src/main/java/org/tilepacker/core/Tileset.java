@@ -69,6 +69,7 @@ public class Tileset {
 		Graphics g = tilesetImage.getGraphics();
 		g.setColor(Color.magenta);
 		g.fillRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
+		g.setAntiAlias(true);
 		for (int i = 0; i < tiles.size(); i++) {
 			Tile tile = tiles.get(i);
 
