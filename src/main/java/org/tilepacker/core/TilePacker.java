@@ -88,6 +88,16 @@ public class TilePacker extends BasicGame {
 				.getOptionValue(TilePackerOptions.TILE_WIDTH));
 		Tile.HEIGHT = Integer.parseInt(commandLine
 				.getOptionValue(TilePackerOptions.TILE_HEIGHT));
+		
+		String padding = commandLine
+				.getOptionValue(TilePackerOptions.TILE_PADDING);
+		if(padding != null && padding.length() > 0) {
+			Tile.PADDING = Integer.parseInt(padding);
+		} else {
+			Tile.PADDING = 0;
+		}
+		
+
 		Tileset.MAX_WIDTH = Integer.parseInt(commandLine
 				.getOptionValue(TilePackerOptions.TILESET_WIDTH));
 		Tileset.MAX_HEIGHT = Integer.parseInt(commandLine

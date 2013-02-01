@@ -20,6 +20,7 @@ public class TilePackerOptions extends Options {
 	public static final String TILESET_HEIGHT = "h";
 	public static final String TILE_WIDTH = "tw";
 	public static final String TILE_HEIGHT = "th";
+	public static final String TILE_PADDING = "tp";
 
 	/**
 	 * Constructor
@@ -32,10 +33,12 @@ public class TilePackerOptions extends Options {
 				"maximum width of the tilesets"));
 		this.addOption(getRequiredOption(TILESET_HEIGHT, "height", true,
 				"maximum height of the tilesets"));
-		this.addOption(getRequiredOption(TILE_WIDTH, "tileWIdth", true,
+		this.addOption(getRequiredOption(TILE_WIDTH, "tileWidth", true,
 				"the width of each tile"));
 		this.addOption(getRequiredOption(TILE_HEIGHT, "tileHeight", true,
 				"the height of each tile"));
+		this.addOption(getOption(TILE_PADDING, "tilePadding", true,
+				"padding around each tile"));
 		this.addOption(getRequiredOption(TARGET_DIRECTORY, "targetDirectory",
 				true, "path to the output directory"));
 		this.addOption(getRequiredOption(FORMAT, "format", true,
@@ -46,6 +49,13 @@ public class TilePackerOptions extends Options {
 			boolean hasArgs, String description) {
 		Option option = new Option(shortParam, longParam, hasArgs, description);
 		option.setRequired(true);
+		return option;
+	}
+	
+	private Option getOption(String shortParam, String longParam,
+			boolean hasArgs, String description) {
+		Option option = new Option(shortParam, longParam, hasArgs, description);
+		option.setRequired(false);
 		return option;
 	}
 }

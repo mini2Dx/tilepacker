@@ -12,6 +12,8 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.imageout.ImageOut;
 
+import sun.security.krb5.internal.PAData;
+
 /**
  * Stores a tileset
  * 
@@ -31,7 +33,9 @@ public class Tileset {
 
 	/**
 	 * Adds a tile to the tileset
-	 * @param tile The {@link Tile} to be added
+	 * 
+	 * @param tile
+	 *            The {@link Tile} to be added
 	 * @return True on success, false if the tileset is full
 	 */
 	public boolean add(Tile tile) {
@@ -43,6 +47,7 @@ public class Tileset {
 
 	/**
 	 * Returns the maximum width in tiles
+	 * 
 	 * @return
 	 */
 	public int getMaximumWidthInTiles() {
@@ -51,6 +56,7 @@ public class Tileset {
 
 	/**
 	 * Returns the maximum height in tiles
+	 * 
 	 * @return
 	 */
 	public int getMaxiumumHeightInTiles() {
@@ -59,8 +65,11 @@ public class Tileset {
 
 	/**
 	 * Saves the tileset to an image
-	 * @param destinationFile The destination filepath
-	 * @param format The file format
+	 * 
+	 * @param destinationFile
+	 *            The destination filepath
+	 * @param format
+	 *            The file format
 	 * @throws SlickException
 	 */
 	public void save(String destinationFile, String format)
@@ -77,8 +86,9 @@ public class Tileset {
 				int y = i / (MAX_WIDTH / Tile.WIDTH);
 				int x = i - (y * (MAX_WIDTH / Tile.WIDTH));
 
-				g.drawImage(tile.getTileImage(), x * Tile.WIDTH, y
-						* Tile.HEIGHT);
+				g.drawImage(tile.getTileImage(), (x * Tile.WIDTH)
+						+ (Tile.PADDING * (x + 1)), (y * Tile.HEIGHT)
+						+ (Tile.PADDING * (y + 1)));
 			}
 		}
 		g.flush();

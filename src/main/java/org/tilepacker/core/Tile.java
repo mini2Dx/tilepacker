@@ -13,6 +13,7 @@ import org.newdawn.slick.Image;
 public class Tile {
 	public static int WIDTH = 32;
 	public static int HEIGHT = 32;
+	public static int PADDING = 0;
 	
 	private Image tileImage;
 	
