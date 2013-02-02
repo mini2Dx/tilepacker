@@ -59,7 +59,7 @@ public class Tileset {
 	 * @return
 	 */
 	public int getMaximumWidthInTiles() {
-		return MAX_WIDTH / Tile.WIDTH;
+		return MAX_WIDTH / (Tile.WIDTH + (Tile.PADDING * 2));
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class Tileset {
 	 * @return
 	 */
 	public int getMaxiumumHeightInTiles() {
-		return MAX_HEIGHT / Tile.HEIGHT;
+		return MAX_HEIGHT / (Tile.HEIGHT + (Tile.PADDING * 2));
 	}
 
 	/**
@@ -91,12 +91,14 @@ public class Tileset {
 			Tile tile = tiles.get(i);
 
 			if (tile != null) {
-				int y = i / (MAX_WIDTH / Tile.WIDTH);
-				int x = i - (y * (MAX_WIDTH / Tile.WIDTH));
+				int y = i / (MAX_WIDTH / (Tile.WIDTH + (Tile.PADDING * 2)));
+				int x = i
+						- (y * (MAX_WIDTH / (Tile.WIDTH + (Tile.PADDING * 2))));
 
-				g.drawImage(tile.getTileImage(), (x * Tile.WIDTH)
-						+ (Tile.PADDING * (x + 1)), (y * Tile.HEIGHT)
-						+ (Tile.PADDING * (y + 1)));
+				g.drawImage(
+						tile.getTileImage(),
+						((x * (Tile.WIDTH + (Tile.PADDING * 2))) + Tile.PADDING),
+						((y * (Tile.HEIGHT + (Tile.PADDING * 2))) + Tile.PADDING));
 			}
 		}
 		g.flush();
