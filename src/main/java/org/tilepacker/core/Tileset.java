@@ -18,9 +18,8 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.imageout.ImageOut;
-
-import sun.security.krb5.internal.PAData;
 
 /**
  * Stores a tileset
@@ -30,13 +29,18 @@ import sun.security.krb5.internal.PAData;
 public class Tileset {
 	public static int MAX_WIDTH;
 	public static int MAX_HEIGHT;
-	private List<Tile> tiles;
+	private List<Rectangle> availableRectangles;
+	private List<Rectangle> usedRectangles;
 
 	/**
 	 * Constructor
 	 */
 	public Tileset() {
-		tiles = new ArrayList<Tile>();
+		availableRectangles = new ArrayList<Rectangle>();
+		usedRectangles = new ArrayList<Rectangle>();
+
+		availableRectangles.add(new Rectangle(0, 0, getMaximumWidthInTiles(),
+				getMaxiumumHeightInTiles()));
 	}
 
 	/**
@@ -46,11 +50,43 @@ public class Tileset {
 	 *            The {@link Tile} to be added
 	 * @return True on success, false if the tileset is full
 	 */
-	public boolean add(Tile tile) {
-		if (tiles.size() + 1 > (getMaximumWidthInTiles() * getMaxiumumHeightInTiles()))
-			return false;
-		tiles.add(tile);
-		return true;
+	public boolean add(SpriteSheet sheet) {
+		for (int i = availableRectangles.size() - 1; i >= 0
+				&& i < availableRectangles.size(); i--) {
+			Rectangle rect = availableRectangles.get(i);
+			if (rect.canContain(sheet)) {
+				Rectangle copyRect = new Rectangle(rect.getX(), rect.getY(),
+						rect.getWidth(), rect.getHeight());
+
+				availableRectangles.remove(i);
+				rect.addTiles(sheet);
+				usedRectangles.add(rect);
+				availableRectangles.add(copyRect);
+
+				List<Rectangle> remaining = new ArrayList<Rectangle>();
+
+				for (int j = availableRectangles.size() - 1; j >= 0; j--) {
+					Rectangle otherRect = availableRectangles.get(j);
+					if (rect.intersects(otherRect)) {
+						Rectangle andRect = Rectangle.and(rect, otherRect);
+						remaining.addAll(Rectangle.subtract(otherRect, andRect));
+						availableRectangles.remove(j);
+					}
+				}
+
+				for(int j = remaining.size() - 1; j >= 0; j--) {
+					for(int k = 0; k < availableRectangles.size(); k++) {
+						if(availableRectangles.get(k).equals(remaining.get(j))) {
+							remaining.remove(j);
+							break;
+						}
+					}
+				}
+				availableRectangles.addAll(remaining);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -58,7 +94,7 @@ public class Tileset {
 	 * 
 	 * @return
 	 */
-	public int getMaximumWidthInTiles() {
+	public static int getMaximumWidthInTiles() {
 		return MAX_WIDTH / (Tile.WIDTH + (Tile.PADDING * 2));
 	}
 
@@ -67,7 +103,7 @@ public class Tileset {
 	 * 
 	 * @return
 	 */
-	public int getMaxiumumHeightInTiles() {
+	public static int getMaxiumumHeightInTiles() {
 		return MAX_HEIGHT / (Tile.HEIGHT + (Tile.PADDING * 2));
 	}
 
@@ -87,18 +123,21 @@ public class Tileset {
 		g.setColor(Color.magenta);
 		g.fillRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
 		g.setAntiAlias(true);
-		for (int i = 0; i < tiles.size(); i++) {
-			Tile tile = tiles.get(i);
+		for (int i = 0; i < usedRectangles.size(); i++) {
+			Rectangle rectangle = usedRectangles.get(i);
 
-			if (tile != null) {
-				int y = i / (MAX_WIDTH / (Tile.WIDTH + (Tile.PADDING * 2)));
-				int x = i
-						- (y * (MAX_WIDTH / (Tile.WIDTH + (Tile.PADDING * 2))));
+			for (int x = 0; x < rectangle.getWidth(); x++) {
+				for (int y = 0; y < rectangle.getHeight(); y++) {
+					int tileX = rectangle.getX() + x;
+					int tileY = rectangle.getY() + y;
 
-				g.drawImage(
-						tile.getTileImage(),
-						((x * (Tile.WIDTH + (Tile.PADDING * 2))) + Tile.PADDING),
-						((y * (Tile.HEIGHT + (Tile.PADDING * 2))) + Tile.PADDING));
+					Tile tile = rectangle.getTiles()[x][y];
+
+					g.drawImage(
+							tile.getTileImage(),
+							((tileX * (Tile.WIDTH + (Tile.PADDING * 2))) + Tile.PADDING),
+							((tileY * (Tile.HEIGHT + (Tile.PADDING * 2))) + Tile.PADDING));
+				}
 			}
 		}
 		g.flush();

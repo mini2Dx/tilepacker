@@ -13,6 +13,7 @@ package org.tilepacker.core;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -36,7 +37,7 @@ public class TilePacker extends BasicGame {
 	public static String SOURCE_DIRECTORY = "";
 	public static String TARGET_DIRECTORY = "";
 
-	private File[] inputFiles;
+	private List<String> inputFiles;
 	private List<Tileset> tilesets;
 
 	/**
@@ -50,25 +51,44 @@ public class TilePacker extends BasicGame {
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 		File sourceDirectory = new File(SOURCE_DIRECTORY);
-		inputFiles = sourceDirectory.listFiles();
-		Tileset tileset = new Tileset();
-		for(int i = 0; i < inputFiles.length; i++) {
-			if(inputFiles[i].getAbsolutePath().endsWith("." + FORMAT.toLowerCase())) {
-				System.out.println("INFO: Reading " + inputFiles[i].getAbsolutePath());
-				SpriteSheet spriteSheet = new SpriteSheet(inputFiles[i].getAbsolutePath(), Tile.WIDTH, Tile.HEIGHT);
-				for(int x = 0; x < spriteSheet.getHorizontalCount(); x++) {
-					for(int y = 0; y < spriteSheet.getVerticalCount(); y++) {
-						Tile tile = new Tile(spriteSheet.getSubImage(x, y));
-						if(!tileset.add(tile)) {
-							tilesets.add(tileset);
-							tileset = new Tileset();
-							tileset.add(tile);
-						}
+		File [] files = sourceDirectory.listFiles();
+		
+		inputFiles = new ArrayList<String>();
+		
+		for(int i = 0; i < files.length; i++) {
+			inputFiles.add(files[i].getAbsolutePath());
+		}
+		
+		Collections.sort(inputFiles);
+		
+		tilesets.add(new Tileset());
+		
+		for(int i = 0; i < inputFiles.size(); i++) {
+			String path = inputFiles.get(i);
+			if(path.endsWith("." + FORMAT.toLowerCase())) {
+				System.out.println("INFO: Reading " + path);
+				SpriteSheet spriteSheet = new SpriteSheet(path, Tile.WIDTH, Tile.HEIGHT);
+				
+				boolean added = false;
+				for(int j = 0; j < tilesets.size(); j++) {
+					Tileset tileset = tilesets.get(j);
+					
+					if(tileset.add(spriteSheet)) {
+						added = true;
+						break;
 					}
+				}
+				
+				if(!added) {
+					Tileset tileset = new Tileset();
+					if(!tileset.add(spriteSheet)) {
+						System.err.println("ERROR: Image too large - " + path);
+						System.exit(0);
+					}
+					tilesets.add(tileset);
 				}
 			}
 		}
-		tilesets.add(tileset);
 	}
 
 	@Override
