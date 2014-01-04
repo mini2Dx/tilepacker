@@ -33,6 +33,7 @@ import org.newdawn.slick.SpriteSheet;
  * @author Thomas Cashman
  */
 public class TilePacker extends BasicGame {
+	public static boolean FIX_TEARING = false;
 	public static String FORMAT = "PNG";
 	public static String SOURCE_DIRECTORY = "";
 	public static String TARGET_DIRECTORY = "";
@@ -119,12 +120,17 @@ public class TilePacker extends BasicGame {
 		
 		String padding = commandLine
 				.getOptionValue(TilePackerOptions.TILE_PADDING);
+		TilePacker.FIX_TEARING = commandLine.hasOption(TilePackerOptions.FIX_TEARING);
+		
 		if(padding != null && padding.length() > 0) {
 			Tile.PADDING = Integer.parseInt(padding);
 		} else {
+			if(FIX_TEARING) {
+				System.err.println("Fix tearing option requires padding to be specified");
+				return;
+			}
 			Tile.PADDING = 0;
 		}
-		
 
 		Tileset.MAX_WIDTH = Integer.parseInt(commandLine
 				.getOptionValue(TilePackerOptions.TILESET_WIDTH));

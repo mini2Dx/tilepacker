@@ -69,14 +69,15 @@ public class Tileset {
 					Rectangle otherRect = availableRectangles.get(j);
 					if (rect.intersects(otherRect)) {
 						Rectangle andRect = Rectangle.and(rect, otherRect);
-						remaining.addAll(Rectangle.subtract(otherRect, andRect));
+						remaining
+								.addAll(Rectangle.subtract(otherRect, andRect));
 						availableRectangles.remove(j);
 					}
 				}
 
-				for(int j = remaining.size() - 1; j >= 0; j--) {
-					for(int k = 0; k < availableRectangles.size(); k++) {
-						if(availableRectangles.get(k).equals(remaining.get(j))) {
+				for (int j = remaining.size() - 1; j >= 0; j--) {
+					for (int k = 0; k < availableRectangles.size(); k++) {
+						if (availableRectangles.get(k).equals(remaining.get(j))) {
 							remaining.remove(j);
 							break;
 						}
@@ -133,10 +134,28 @@ public class Tileset {
 
 					Tile tile = rectangle.getTiles()[x][y];
 
-					g.drawImage(
-							tile.getTileImage(),
-							((tileX * (Tile.WIDTH + (Tile.PADDING * 2))) + Tile.PADDING),
-							((tileY * (Tile.HEIGHT + (Tile.PADDING * 2))) + Tile.PADDING));
+					int renderX = ((tileX * (Tile.WIDTH + (Tile.PADDING * 2))) + Tile.PADDING);
+					int renderY = ((tileY * (Tile.HEIGHT + (Tile.PADDING * 2))) + Tile.PADDING);
+
+					if (TilePacker.FIX_TEARING) {
+						g.setWorldClip(renderX - 2, renderY - 1, 2, Tile.HEIGHT + 2);
+						g.drawImage(tile.getTileImage(), renderX - 1, renderY);
+						g.clearWorldClip();
+						
+						g.setWorldClip(renderX + Tile.WIDTH, renderY - 1, 2, Tile.HEIGHT + 2);
+						g.drawImage(tile.getTileImage(), renderX  +1, renderY);
+						g.clearWorldClip();
+						
+						g.setWorldClip(renderX - 1, renderY - 2, Tile.WIDTH + 2, 2);
+						g.drawImage(tile.getTileImage(), renderX, renderY - 1);
+						g.clearWorldClip();
+						
+						g.setWorldClip(renderX - 1, renderY + Tile.HEIGHT, Tile.WIDTH + 2, 2);
+						g.drawImage(tile.getTileImage(), renderX, renderY + 1);
+						g.clearWorldClip();
+					}
+
+					g.drawImage(tile.getTileImage(), renderX, renderY);
 				}
 			}
 		}

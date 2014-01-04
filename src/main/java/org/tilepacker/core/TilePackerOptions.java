@@ -29,6 +29,7 @@ public class TilePackerOptions extends Options {
 	public static final String TILE_WIDTH = "tw";
 	public static final String TILE_HEIGHT = "th";
 	public static final String TILE_PADDING = "tp";
+	public static final String FIX_TEARING = "ft";
 
 	/**
 	 * Constructor
@@ -51,6 +52,8 @@ public class TilePackerOptions extends Options {
 				true, "path to the output directory"));
 		this.addOption(getRequiredOption(FORMAT, "format", true,
 				"output image format - PNG, JPG or TGA"));
+		this.addOption(getOption(FIX_TEARING, "fixTearing", false,
+				"fixes gaps in tiles when scaling"));
 	}
 
 	private Option getRequiredOption(String shortParam, String longParam,
