@@ -1,0 +1,3 @@
+include "core", "gradle-plugin"
+rootProject.name = 'tilepacker'
+rootProject.children.each { it.name = rootProject.name + "-" + it.name }

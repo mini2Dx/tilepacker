@@ -1,0 +1,44 @@
+subprojects {
+	apply plugin: 'maven'
+	
+	repositories {
+		mavenLocal()
+		mavenCentral()
+	}
+	
+	group = 'org.mini2Dx'
+	version = '3.0.0-SNAPSHOT'
+}
+
+project(":" + rootProject.name + "-core") {
+	apply plugin: 'application'
+	
+	mainClassName = "org.tilepacker.core.TilePacker"
+	
+	dependencies {
+		compile 'org.simpleframework:simple-xml:2.7.1'
+		compile fileTree(dir: 'lib', include: ['*.jar'])
+	
+		testCompile 'org.jmock:jmock-junit4:2.5.1'
+		testCompile 'org.jmock:jmock-legacy:2.5.1'
+		testCompile 'junit:junit:4.8.2'
+	}
+}
+
+project(":" + rootProject.name + "-gradle-plugin") {
+	apply plugin: 'groovy'
+	
+	dependencies {
+		compile project(":" + rootProject.name + "-core")
+		compile gradleApi()
+		compile localGroovy()
+	
+		testCompile 'org.jmock:jmock-junit4:2.5.1'
+		testCompile 'org.jmock:jmock-legacy:2.5.1'
+		testCompile 'junit:junit:4.8.2'
+	}
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.4'
+}

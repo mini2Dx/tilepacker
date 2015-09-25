@@ -1,9 +1,11 @@
 target/
 
 .DS_Store
-
 .classpath
-
 .project
 
 *.prefs
+build/
+bin/
+.gradle/
+.prefs
