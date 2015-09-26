@@ -1,0 +1,15 @@
+<tilePackerConfig>
+   <tileWidth>32</tileWidth>
+   <tileHeight>32</tileHeight>
+   <tilesetWidth>512</tilesetWidth>
+   <tilesetHeight>512</tilesetHeight>
+   <tilePadding>2</tilePadding>
+   <outputFormat>PNG</outputFormat>
+   <outputPath>./</outputPath>
+   <preventTearing>true</preventTearing>
+   <tiles class="java.util.ArrayList">
+      <string>./tile1.png</string>
+      <string>./tile2.png</string>
+      <string>./tile3.png</string>
+   </tiles>
+</tilePackerConfig>
