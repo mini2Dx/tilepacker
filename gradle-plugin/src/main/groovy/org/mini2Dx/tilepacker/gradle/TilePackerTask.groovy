@@ -24,19 +24,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.tilepacker.core;
+package org.mini2Dx.tilepacker.gradle
+
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.TaskAction
+import org.mini2Dx.tilepacker.core.TilePacker
 
 /**
  *
  */
-public class TilePackerException extends RuntimeException {
-	private static final long serialVersionUID = 2606592491379010866L;
+class TilePackerTask extends DefaultTask {
+	File configFile;
 
-	public TilePackerException(String message) {
-		super(message);
-	}
-	
-	public TilePackerException(String message, Exception e) {
-		super(message, e);
+	@TaskAction
+	def packTiles() {
+		TilePacker tilePacker = new TilePacker(configFile);
+		tilePacker.run(getClass().classLoader);
 	}
 }

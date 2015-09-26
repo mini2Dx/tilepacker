@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.tilepacker.core;
+package org.mini2Dx.tilepacker.core;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -81,17 +81,19 @@ public class TilePacker extends BasicGame {
 			throw new TilePackerException("ERROR: If tearing prevention is enabled, the tile padding must be greater than 0");
 		}
 		TilePacker.FORMAT = config.getOutputFormat();
+		TilePacker.TARGET_DIRECTORY = new File(configFile.getParent(), config.getOutputPath());
 
 		inputFiles = config.getTiles();
 	}
 	
-	public void run() {
+	public void run(ClassLoader classLoader) {
 		AppGameContainer gc;
 		try {
+			NativeLoader.loadNatives(classLoader);
 			gc = new AppGameContainer(this, Tileset.MAX_WIDTH, Tileset.MAX_HEIGHT, false);
+			gc.setForceExit(false);
 			gc.start();
 		} catch (SlickException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -144,6 +146,6 @@ public class TilePacker extends BasicGame {
 			System.err.println("Usage: java -jar tilepacker-core-standalone.jar ./path/to/config.xml");
 			System.exit(0);
 		}
-		new TilePacker(new File(args[0])).run();
+		new TilePacker(new File(args[0])).run(TilePacker.class.getClassLoader());
 	}
 }

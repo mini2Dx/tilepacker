@@ -1,3 +1,10 @@
+buildscript {
+	repositories { jcenter() }
+	dependencies {
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
+	}
+}
+
 subprojects {
 	apply plugin: 'maven'
 	
@@ -12,8 +19,9 @@ subprojects {
 
 project(":" + rootProject.name + "-core") {
 	apply plugin: 'application'
+	apply plugin: 'com.github.johnrengelman.shadow'
 	
-	mainClassName = "org.tilepacker.core.TilePacker"
+	mainClassName = "org.mini2Dx.tilepacker.core.TilePacker"
 	
 	dependencies {
 		compile 'org.simpleframework:simple-xml:2.7.1'
@@ -23,6 +31,16 @@ project(":" + rootProject.name + "-core") {
 		testCompile 'org.jmock:jmock-legacy:2.5.1'
 		testCompile 'junit:junit:4.8.2'
 	}
+	
+	shadowJar {
+		baseName = rootProject.name + "-core"
+		classifier = ''
+		dependencies {
+			exclude(dependency('org.simpleframework:simple-xml:2.7.1'))
+		}
+	}
+	
+	assemble.dependsOn shadowJar
 }
 
 project(":" + rootProject.name + "-gradle-plugin") {

@@ -24,21 +24,35 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.tilepacker.gradle
+package org.mini2Dx.tilepacker.core;
 
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
-import org.tilepacker.core.TilePacker
+import org.newdawn.slick.Image;
 
 /**
- *
+ * Stores a single tile
+ * 
+ * @author Thomas Cashman
  */
-class TilepackerTask extends DefaultTask {
-	File configFile;
+public class Tile {
+	public static int WIDTH = 32;
+	public static int HEIGHT = 32;
+	public static int PADDING = 0;
+	
+	private Image tileImage;
+	
+	/**
+	 * Constructor
+	 * @param tileImage The tile's {@link Image} instance
+	 */
+	public Tile(Image tileImage) {
+		this.tileImage = tileImage;
+	}
 
-	@TaskAction
-	def packTiles() {
-		TilePacker tilePacker = new TilePacker(configFile);
-		tilePacker.run();
+	/**
+	 * The tile image
+	 * @return
+	 */
+	public Image getTileImage() {
+		return tileImage;
 	}
 }

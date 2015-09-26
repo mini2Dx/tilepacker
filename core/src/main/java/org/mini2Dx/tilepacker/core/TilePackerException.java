@@ -24,35 +24,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.tilepacker.core;
-
-import org.newdawn.slick.Image;
+package org.mini2Dx.tilepacker.core;
 
 /**
- * Stores a single tile
- * 
- * @author Thomas Cashman
+ *
  */
-public class Tile {
-	public static int WIDTH = 32;
-	public static int HEIGHT = 32;
-	public static int PADDING = 0;
-	
-	private Image tileImage;
-	
-	/**
-	 * Constructor
-	 * @param tileImage The tile's {@link Image} instance
-	 */
-	public Tile(Image tileImage) {
-		this.tileImage = tileImage;
-	}
+public class TilePackerException extends RuntimeException {
+	private static final long serialVersionUID = 2606592491379010866L;
 
-	/**
-	 * The tile image
-	 * @return
-	 */
-	public Image getTileImage() {
-		return tileImage;
+	public TilePackerException(String message) {
+		super(message);
+	}
+	
+	public TilePackerException(String message, Exception e) {
+		super(message, e);
 	}
 }

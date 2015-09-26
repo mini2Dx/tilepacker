@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Archiver-Version: Plexus Archiver
-Created-By: Apache Maven
-Built-By: tom
-Build-Jdk: 1.6.0_33
-Main-Class: org.tilepacker.core.TilePacker
-Class-Path: lib/commons-cli-1.2.jar lib/slick-0.4.jar lib/jinput-0.4.jar lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar lib/lwjgl-0.4.jar lib/lwjgl-util-0.4.jar

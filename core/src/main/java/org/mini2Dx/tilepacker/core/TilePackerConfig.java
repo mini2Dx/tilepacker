@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.tilepacker.core;
+package org.mini2Dx.tilepacker.core;
 
 import java.util.List;
 
@@ -49,6 +49,8 @@ public class TilePackerConfig {
 	private int tilePadding = 0;
 	@Element
 	private String outputFormat = "PNG";
+	@Element
+	private String outputPath = "./";
 	@Element
 	private boolean preventTearing = false;
 	@ElementList(name="tiles")
@@ -102,6 +104,14 @@ public class TilePackerConfig {
 		this.outputFormat = outputFormat;
 	}
 	
+	public String getOutputPath() {
+		return outputPath;
+	}
+
+	public void setOutputPath(String outputPath) {
+		this.outputPath = outputPath;
+	}
+
 	public boolean isPreventTearing() {
 		return preventTearing;
 	}
