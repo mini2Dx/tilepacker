@@ -6,17 +6,51 @@ A Gradle plugin and command line utility for packing individual tile images into
 Gradle
 ---------
 
+First, include the mini2Dx repositories in your buildscripts section. This is where tilepacker is deployed to.
+
+```gradle
+buildscript {
+    repositories {
+		mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "http://maven.mini2dx.org/content/repositories/thirdparty/" }
+        maven { url "http://maven.mini2dx.org/content/repositories/releases/" }
+    }
+    dependencies {
+		classpath 'org.tilepacker:tilepacker-gradle-plugin:3.0.0'
+    }
+}
+```
+
+Then define a task for packing up your tiles into tilesets.
+
+```gradle
+task tilePack(type: org.tilepacker.gradle.TilePackerTask) {
+	configFile file('config.xml')
+}
+```
+
+A sample configuration file can be found [here](https://raw.githubusercontent.com/tomcashman/tilepacker/master/config.sample.xml).
+
 Command Line
 ---------
 On the command line, the application takes a single argument - the path to the configuration file. The configuraiton file tells tilepacker which settings to apply and which files to pack into tilesets.
 
-A sample configuration file can be found here.
+A sample configuration file can be found [here](https://raw.githubusercontent.com/tomcashman/tilepacker/master/config.sample.xml).
+
+Windows
 
 ```bash
-java -jar tilepacker-core-standalone.jar ./path/to/config.xml
+tilepacker-core.bat ./path/to/config.xml
 ```
 
-take individual tile images from files in the source folder /input/ and generate tilesets into the target folder /output/. Each tile is 32 pixels by 32 pixels (images larger than this will be split into multiple tiles). The maximum size for the tilesets will be 512 pixels by 512 pixels. The source and target images will be PNG format (other formats can be JPG or TGA).
+Mac OS X / Linux
+
+```bash
+./tilepacker-core ./path/to/config.xml
+```
+
 
 Configuration Options
 ---------
