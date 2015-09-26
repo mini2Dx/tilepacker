@@ -1,0 +1,16 @@
+[3.0.0]
+- TilePacker now also available as a Gradle task
+- Now uses configuration file instead of command line arguments
+- Added option for preventing tearing by padding tiles by 1 border pixel
+
+[2.0.0]
+- TilePacker now uses maxRects algorithm for packing tiles
+
+[1.1.1]
+- Fixed incorrect padding calculations
+
+[1.1.0]
+- Added option for padding between tiles
+
+[1.0.0]
+- Initial release
