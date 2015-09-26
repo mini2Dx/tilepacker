@@ -8,6 +8,9 @@ buildscript {
 subprojects {
 	apply plugin: 'maven'
 	
+	group = 'org.tilepacker'
+	version = '3.0.0-SNAPSHOT'
+	
 	uploadArchives {
 		repositories {
 			mavenDeployer {
@@ -29,16 +32,13 @@ subprojects {
 		mavenLocal()
 		mavenCentral()
 	}
-	
-	group = 'org.mini2Dx'
-	version = '3.0.0-SNAPSHOT'
 }
 
 project(":" + rootProject.name + "-core") {
 	apply plugin: 'application'
 	apply plugin: 'com.github.johnrengelman.shadow'
 	
-	mainClassName = "org.mini2Dx.tilepacker.core.TilePacker"
+	mainClassName = "org.tilepacker.core.TilePacker"
 	
 	dependencies {
 		compile 'org.simpleframework:simple-xml:2.7.1'

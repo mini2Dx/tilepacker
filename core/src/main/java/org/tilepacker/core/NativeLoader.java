@@ -1,7 +1,7 @@
 /**
  * Copyright 2015 Thomas Cashman
  */
-package org.mini2Dx.tilepacker.core;
+package org.tilepacker.core;
 
 import java.io.File;
 import java.io.FileInputStream;

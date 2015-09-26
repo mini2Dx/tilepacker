@@ -24,11 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.mini2Dx.tilepacker.gradle
+package org.tilepacker.gradle
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
-import org.mini2Dx.tilepacker.core.TilePacker
+import org.tilepacker.core.TilePacker
 
 /**
  *

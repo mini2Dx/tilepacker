@@ -8,7 +8,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.mini2Dx.tilepacker.core.Rectangle;
+import org.tilepacker.core.Rectangle;
 
 /**
  * Unit tests for rectangles
