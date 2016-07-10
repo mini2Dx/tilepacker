@@ -13,12 +13,9 @@ buildscript {
     repositories {
 		mavenLocal()
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "http://maven.mini2dx.org/content/repositories/thirdparty/" }
-        maven { url "http://maven.mini2dx.org/content/repositories/releases/" }
     }
     dependencies {
-		classpath 'org.tilepacker:tilepacker-gradle-plugin:3.0.0'
+		classpath 'org.mini2Dx:tilepacker-gradle-plugin:3.0.1'
     }
 }
 ```

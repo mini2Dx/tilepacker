@@ -1,3 +1,9 @@
+[3.0.1]
+- Improved memory consumption
+- Significantly improved performance
+- Fixed gradle process not terminating after completion
+- Moved to org.mini2Dx maven group
+
 [3.0.0]
 - TilePacker now also available as a Gradle task
 - Now uses configuration file instead of command line arguments
