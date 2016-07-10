@@ -26,6 +26,10 @@
  */
 package org.tilepacker.gradle
 
+import java.awt.SystemTray
+import java.awt.TrayIcon
+import java.util.Set;
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.tilepacker.core.TilePacker
@@ -40,5 +44,24 @@ class TilePackerTask extends DefaultTask {
 	def packTiles() {
 		TilePacker tilePacker = new TilePacker(configFile);
 		tilePacker.run(getClass().classLoader);
+		
+		boolean awtRunning = true;
+		boolean appKitRunning = true;
+		while(awtRunning) {
+			try {
+				Thread.sleep(1000);
+			} catch (Exception e) {}
+			awtRunning = false;
+			appKitRunning = false;
+			
+			Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+			for(Thread thread : threadSet) {
+				if(thread.getName().contains("AWT")) {
+					awtRunning = true;
+				} else if(thread.getName().contains("AppKit")) {
+					appKitRunning = true;
+				}
+			}
+		}
 	}
 }

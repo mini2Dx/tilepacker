@@ -31,6 +31,12 @@ task tilePack(type: org.tilepacker.gradle.TilePackerTask) {
 }
 ```
 
+Then run the task with the ```--no-daemon``` option.
+
+```bash
+gradle tilePack --no-daemon
+```
+
 A sample configuration file can be found [here](https://raw.githubusercontent.com/tomcashman/tilepacker/master/config.sample.xml).
 
 Command Line

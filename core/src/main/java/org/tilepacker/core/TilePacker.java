@@ -29,11 +29,13 @@ package org.tilepacker.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.simpleframework.xml.Serializer;
@@ -90,12 +92,16 @@ public class TilePacker extends BasicGame {
 		AppGameContainer gc;
 		try {
 			NativeLoader.loadNatives(classLoader);
+			Input.disableControllers();
+			
 			gc = new AppGameContainer(this, Tileset.MAX_WIDTH, Tileset.MAX_HEIGHT, false);
 			gc.setForceExit(false);
+			gc.setSoundOn(false);
 			gc.setUpdateOnlyWhenVisible(false);
 			gc.setAlwaysRender(true);
 			gc.start();
 		} catch (SlickException e) {
+			e.printStackTrace();
 		}
 	}
 
