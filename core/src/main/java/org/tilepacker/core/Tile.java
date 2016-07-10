@@ -27,6 +27,7 @@
 package org.tilepacker.core;
 
 import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 /**
  * Stores a single tile
@@ -54,5 +55,19 @@ public class Tile {
 	 */
 	public Image getTileImage() {
 		return tileImage;
+	}
+	
+	/**
+	 * Cleans up used resources
+	 */
+	public void dispose() {
+		if(tileImage == null) {
+			return;
+		}
+		try {
+			tileImage.destroy();
+		} catch (SlickException e) {
+			e.printStackTrace();
+		}
 	}
 }

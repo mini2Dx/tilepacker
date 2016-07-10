@@ -58,6 +58,18 @@ public class Rectangle {
 		width = sheet.getHorizontalCount();
 		height = sheet.getVerticalCount();
 	}
+	
+	public void dispose() {
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				Tile tile = tiles[x][y];
+				if(tile == null) {
+					continue;
+				}
+				tile.dispose();
+			}
+		}
+	}
 
 	public static Rectangle and(Rectangle rect1, Rectangle rect2) {
 		if(!rect1.intersects(rect2)) {
@@ -73,9 +85,7 @@ public class Rectangle {
 		return new Rectangle(x, y, (maxX - x) + 1, (maxY - y) + 1);
 	}
 
-	public static List<Rectangle> subtract(Rectangle rect, Rectangle innerRect) {
-		List<Rectangle> result = new ArrayList<Rectangle>();
-
+	public static List<Rectangle> subtract(List<Rectangle> result, Rectangle rect, Rectangle innerRect) {
 		int leftMinX = Math.min(rect.getX(), innerRect.getX());
 		int leftMaxX = Math.max(rect.getX(), innerRect.getX());
 

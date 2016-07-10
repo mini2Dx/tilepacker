@@ -3,12 +3,12 @@
  */
 package org.tilepacker.core;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
-import org.tilepacker.core.Rectangle;
+
+import junit.framework.Assert;
 
 /**
  * Unit tests for rectangles
@@ -107,7 +107,8 @@ public class RectangleTest {
 		rectangle1 = new Rectangle(0, 0, 4, 4);
 		rectangle2 = new Rectangle(0, 0, 1, 4);
 
-		List<Rectangle> remaining = Rectangle.subtract(rectangle1, rectangle2);
+		List<Rectangle> remaining = new ArrayList<Rectangle>();
+		Rectangle.subtract(remaining, rectangle1, rectangle2);
 		Assert.assertEquals(1, remaining.size());
 
 		Rectangle diffRect = remaining.get(0);
@@ -122,7 +123,8 @@ public class RectangleTest {
 		rectangle1 = new Rectangle(0, 0, 4, 4);
 		rectangle2 = new Rectangle(3, 0, 1, 4);
 
-		List<Rectangle> remaining = Rectangle.subtract(rectangle1, rectangle2);
+		List<Rectangle> remaining = new ArrayList<Rectangle>();
+		Rectangle.subtract(remaining, rectangle1, rectangle2);
 		Assert.assertEquals(1, remaining.size());
 
 		Rectangle diffRect = remaining.get(0);
@@ -137,7 +139,8 @@ public class RectangleTest {
 		rectangle1 = new Rectangle(0, 0, 4, 4);
 		rectangle2 = new Rectangle(0, 0, 4, 1);
 
-		List<Rectangle> remaining = Rectangle.subtract(rectangle1, rectangle2);
+		List<Rectangle> remaining = new ArrayList<Rectangle>();
+		Rectangle.subtract(remaining, rectangle1, rectangle2);
 		Assert.assertEquals(1, remaining.size());
 
 		Rectangle diffRect = remaining.get(0);
@@ -152,7 +155,8 @@ public class RectangleTest {
 		rectangle1 = new Rectangle(0, 0, 4, 4);
 		rectangle2 = new Rectangle(0, 3, 4, 1);
 
-		List<Rectangle> remaining = Rectangle.subtract(rectangle1, rectangle2);
+		List<Rectangle> remaining = new ArrayList<Rectangle>();
+		Rectangle.subtract(remaining, rectangle1, rectangle2);
 		Assert.assertEquals(1, remaining.size());
 
 		Rectangle diffRect = remaining.get(0);
@@ -167,7 +171,8 @@ public class RectangleTest {
 		rectangle1 = new Rectangle(0, 0, 4, 4);
 		rectangle2 = new Rectangle(0, 0, 1, 1);
 
-		List<Rectangle> remaining = Rectangle.subtract(rectangle1, rectangle2);
+		List<Rectangle> remaining = new ArrayList<Rectangle>();
+		Rectangle.subtract(remaining, rectangle1, rectangle2);
 		Assert.assertEquals(2, remaining.size());
 
 		for (int i = 0; i < remaining.size(); i++) {
@@ -191,7 +196,8 @@ public class RectangleTest {
 		rectangle1 = new Rectangle(0, 0, 4, 4);
 		rectangle2 = new Rectangle(2, 2, 2, 2);
 
-		List<Rectangle> remaining = Rectangle.subtract(rectangle1, rectangle2);
+		List<Rectangle> remaining = new ArrayList<Rectangle>();
+		Rectangle.subtract(remaining, rectangle1, rectangle2);
 		Assert.assertEquals(2, remaining.size());
 
 		for (int i = 0; i < remaining.size(); i++) {
@@ -215,7 +221,8 @@ public class RectangleTest {
 		rectangle1 = new Rectangle(0, 0, 4, 4);
 		rectangle2 = new Rectangle(2, 0, 1, 2);
 
-		List<Rectangle> remaining = Rectangle.subtract(rectangle1, rectangle2);
+		List<Rectangle> remaining = new ArrayList<Rectangle>();
+		Rectangle.subtract(remaining, rectangle1, rectangle2);
 		Assert.assertEquals(3, remaining.size());
 
 		for (int i = 0; i < remaining.size(); i++) {

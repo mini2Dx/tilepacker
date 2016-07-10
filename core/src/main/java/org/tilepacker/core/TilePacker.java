@@ -92,6 +92,8 @@ public class TilePacker extends BasicGame {
 			NativeLoader.loadNatives(classLoader);
 			gc = new AppGameContainer(this, Tileset.MAX_WIDTH, Tileset.MAX_HEIGHT, false);
 			gc.setForceExit(false);
+			gc.setUpdateOnlyWhenVisible(false);
+			gc.setAlwaysRender(true);
 			gc.start();
 		} catch (SlickException e) {
 		}
@@ -103,28 +105,40 @@ public class TilePacker extends BasicGame {
 
 		for (int i = 0; i < inputFiles.size(); i++) {
 			String path = inputFiles.get(i);
-			if (path.endsWith("." + FORMAT.toLowerCase())) {
-				System.out.println("INFO: Reading " + path);
-				SpriteSheet spriteSheet = new SpriteSheet(new File(configFileDir, path).getAbsolutePath(), Tile.WIDTH,
-						Tile.HEIGHT);
+			if (!path.endsWith("." + FORMAT.toLowerCase())) {
+				throw new TilePackerException("ERROR: " + path + " does not match format " + FORMAT.toLowerCase());
+			}
+			System.out.println("INFO: Reading " + path);
+			File tileFile = new File(configFileDir, path);
+			if(!tileFile.exists()) {
+				throw new TilePackerException("ERROR: " + path + " does not exist");
+			}
+			SpriteSheet spriteSheet = new SpriteSheet(tileFile.getAbsolutePath(), Tile.WIDTH,
+					Tile.HEIGHT);
 
-				boolean added = false;
-				for (int j = 0; j < tilesets.size(); j++) {
-					Tileset tileset = tilesets.get(j);
+			boolean added = false;
+			for (int j = 0; j < tilesets.size(); j++) {
+				Tileset tileset = tilesets.get(j);
 
-					if (tileset.add(spriteSheet)) {
-						added = true;
-						break;
+				if (tileset.add(spriteSheet)) {
+					added = true;
+					System.out.println("INFO: Added " + path + " to tileset " + j);
+					
+					if (tileset.isFull()) {
+						System.out.println("INFO: Tileset " + j + " is now full. Saving to disk.");
+						tileset.save(new File(TARGET_DIRECTORY, j + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
 					}
+					break;
 				}
+			}
 
-				if (!added) {
-					Tileset tileset = new Tileset();
-					if (!tileset.add(spriteSheet)) {
-						throw new TilePackerException("ERROR: Image too large - " + path);
-					}
-					tilesets.add(tileset);
+			if (!added) {
+				Tileset tileset = new Tileset();
+				if (!tileset.add(spriteSheet)) {
+					throw new TilePackerException("ERROR: Image too large - " + path);
 				}
+				System.out.println("INFO: Added " + path + " to tileset " + tilesets.size());
+				tilesets.add(tileset);
 			}
 		}
 	}
@@ -135,8 +149,12 @@ public class TilePacker extends BasicGame {
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		for (int i = 0; i < tilesets.size(); i++) {
+			Tileset tileset = tilesets.get(i);
+			if(tileset.isSaved()) {
+				continue;
+			}
 			System.out.println("INFO: Saving tileset - " + i);
-			tilesets.get(i).save(new File(TARGET_DIRECTORY, i + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
+			tileset.save(new File(TARGET_DIRECTORY, i + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
 		}
 		gc.exit();
 	}

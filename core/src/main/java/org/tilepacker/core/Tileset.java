@@ -44,15 +44,19 @@ import org.newdawn.slick.imageout.ImageOut;
 public class Tileset {
 	public static int MAX_WIDTH;
 	public static int MAX_HEIGHT;
+	
+	private final List<Rectangle> tmpRemaining = new ArrayList<Rectangle>(1);
+	
 	private List<Rectangle> availableRectangles;
 	private List<Rectangle> usedRectangles;
+	private boolean saved = false;
 
 	/**
 	 * Constructor
 	 */
 	public Tileset() {
-		availableRectangles = new ArrayList<Rectangle>();
-		usedRectangles = new ArrayList<Rectangle>();
+		availableRectangles = new ArrayList<Rectangle>(1);
+		usedRectangles = new ArrayList<Rectangle>(1);
 
 		availableRectangles.add(new Rectangle(0, 0, getMaximumWidthInTiles(),
 				getMaxiumumHeightInTiles()));
@@ -66,6 +70,9 @@ public class Tileset {
 	 * @return True on success, false if the tileset is full
 	 */
 	public boolean add(SpriteSheet sheet) {
+		if(saved) {
+			return false;
+		}
 		for (int i = availableRectangles.size() - 1; i >= 0
 				&& i < availableRectangles.size(); i--) {
 			Rectangle rect = availableRectangles.get(i);
@@ -78,27 +85,24 @@ public class Tileset {
 				usedRectangles.add(rect);
 				availableRectangles.add(copyRect);
 
-				List<Rectangle> remaining = new ArrayList<Rectangle>();
-
 				for (int j = availableRectangles.size() - 1; j >= 0; j--) {
 					Rectangle otherRect = availableRectangles.get(j);
 					if (rect.intersects(otherRect)) {
 						Rectangle andRect = Rectangle.and(rect, otherRect);
-						remaining
-								.addAll(Rectangle.subtract(otherRect, andRect));
+						Rectangle.subtract(tmpRemaining, otherRect, andRect);
 						availableRectangles.remove(j);
 					}
 				}
 
-				for (int j = remaining.size() - 1; j >= 0; j--) {
+				for (int j = tmpRemaining.size() - 1; j >= 0; j--) {
 					for (int k = 0; k < availableRectangles.size(); k++) {
-						if (availableRectangles.get(k).equals(remaining.get(j))) {
-							remaining.remove(j);
-							break;
+						if (availableRectangles.get(k).equals(tmpRemaining.get(j))) {
+							tmpRemaining.remove(j);
 						}
 					}
 				}
-				availableRectangles.addAll(remaining);
+				availableRectangles.addAll(tmpRemaining);
+				tmpRemaining.clear();
 				return true;
 			}
 		}
@@ -122,6 +126,22 @@ public class Tileset {
 	public static int getMaxiumumHeightInTiles() {
 		return MAX_HEIGHT / (Tile.HEIGHT + (Tile.PADDING * 2));
 	}
+	
+	/**
+	 * Returns if no more sprites can be placed in this tileset
+	 * @return
+	 */
+	public boolean isFull() {
+		return availableRectangles.size() == 0;
+	}
+
+	/**
+	 * Returns if this tileset has been saved to disk
+	 * @return
+	 */
+	public boolean isSaved() {
+		return saved;
+	}
 
 	/**
 	 * Saves the tileset to an image
@@ -134,6 +154,9 @@ public class Tileset {
 	 */
 	public void save(String destinationFile, String format)
 			throws SlickException {
+		if(saved) {
+			return;
+		}
 		Image tilesetImage = new Image(MAX_WIDTH, MAX_HEIGHT);
 		Graphics g = tilesetImage.getGraphics();
 		g.setColor(Color.magenta);
@@ -176,5 +199,10 @@ public class Tileset {
 		}
 		g.flush();
 		ImageOut.write(tilesetImage, format, destinationFile);
+		for (int i = 0; i < usedRectangles.size(); i++) {
+			Rectangle rectangle = usedRectangles.get(i);
+			rectangle.dispose();
+		}
+		saved = true;
 	}
 }
