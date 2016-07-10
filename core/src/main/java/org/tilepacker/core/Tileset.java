@@ -27,6 +27,7 @@
 package org.tilepacker.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.newdawn.slick.Color;
@@ -45,6 +46,7 @@ public class Tileset {
 	public static int MAX_WIDTH;
 	public static int MAX_HEIGHT;
 	
+	private final SmallToLargeRectangleComparator rectangleComparator = new SmallToLargeRectangleComparator();
 	private final List<Rectangle> tmpRemaining = new ArrayList<Rectangle>(1);
 	
 	private List<Rectangle> availableRectangles;
@@ -73,38 +75,42 @@ public class Tileset {
 		if(saved) {
 			return false;
 		}
-		for (int i = availableRectangles.size() - 1; i >= 0
-				&& i < availableRectangles.size(); i--) {
+		for (int i = 0; i < availableRectangles.size(); i++) {
 			Rectangle rect = availableRectangles.get(i);
-			if (rect.canContain(sheet)) {
-				Rectangle copyRect = new Rectangle(rect.getX(), rect.getY(),
-						rect.getWidth(), rect.getHeight());
-
-				availableRectangles.remove(i);
-				rect.addTiles(sheet);
-				usedRectangles.add(rect);
-				availableRectangles.add(copyRect);
-
-				for (int j = availableRectangles.size() - 1; j >= 0; j--) {
-					Rectangle otherRect = availableRectangles.get(j);
-					if (rect.intersects(otherRect)) {
-						Rectangle andRect = Rectangle.and(rect, otherRect);
-						Rectangle.subtract(tmpRemaining, otherRect, andRect);
-						availableRectangles.remove(j);
-					}
-				}
-
-				for (int j = tmpRemaining.size() - 1; j >= 0; j--) {
-					for (int k = 0; k < availableRectangles.size(); k++) {
-						if (availableRectangles.get(k).equals(tmpRemaining.get(j))) {
-							tmpRemaining.remove(j);
-						}
-					}
-				}
-				availableRectangles.addAll(tmpRemaining);
-				tmpRemaining.clear();
-				return true;
+			if (!rect.canContain(sheet)) {
+				continue;
 			}
+			Rectangle copyRect = new Rectangle(rect.getX(), rect.getY(),
+					rect.getWidth(), rect.getHeight());
+
+			availableRectangles.remove(i);
+			rect.addTiles(sheet);
+			usedRectangles.add(rect);
+			availableRectangles.add(copyRect);
+
+			for (int j = 0; j < availableRectangles.size(); j++) {
+				Rectangle otherRect = availableRectangles.get(j);
+				if (!rect.intersects(otherRect)) {
+					continue;
+				}
+				Rectangle andRect = Rectangle.and(rect, otherRect);
+				Rectangle.subtract(tmpRemaining, otherRect, andRect);
+				availableRectangles.remove(j);
+				j--;
+			}
+
+			for (int j = tmpRemaining.size() - 1; j >= 0; j--) {
+				for (int k = 0; k < availableRectangles.size(); k++) {
+					if (availableRectangles.get(k).equals(tmpRemaining.get(j))) {
+						tmpRemaining.remove(j);
+						break;
+					}
+				}
+			}
+			availableRectangles.addAll(tmpRemaining);
+			Collections.sort(availableRectangles, rectangleComparator);
+			tmpRemaining.clear();
+			return true;
 		}
 		return false;
 	}

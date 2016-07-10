@@ -180,4 +180,8 @@ public class Rectangle {
 	public int getMaxY() {
 		return y + (height - 1);
 	}
+	
+	public int getArea() {
+		return width * height;
+	}
 }
