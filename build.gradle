@@ -9,7 +9,7 @@ subprojects {
 	apply plugin: 'maven'
 	
 	group = 'org.tilepacker'
-	version = '3.0.0'
+	version = '3.0.1-SNAPSHOT'
 	
 	uploadArchives {
 		repositories {
