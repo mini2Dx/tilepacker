@@ -1,36 +1,104 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 buildscript {
-	repositories { jcenter() }
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		jcenter()
+	}
 	dependencies {
 		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
+		classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
+	}
+}
+
+if(project.hasProperty('ossrhUser') && project.hasProperty("release")) {
+	apply plugin: "io.codearte.nexus-staging"
+
+	nexusStaging {
+		packageGroup = 'org.mini2Dx'
+		username = ossrhUser
+		password = ossrhPassword
 	}
 }
 
 subprojects {
-	apply plugin: 'maven'
-	
-	group = 'org.tilepacker'
-	version = '3.0.1-SNAPSHOT'
-	
-	uploadArchives {
-		repositories {
-			mavenDeployer {
-				repository(url: "http://maven.mini2dx.org/content/repositories/releases") {
-					if(project.hasProperty('mini2DxMavenUser')) {
-						authentication(userName: project.property('mini2DxMavenUser'), password: project.property('mini2DxMavenPassword'))
-					}
-				}
-				snapshotRepository(url: "http://maven.mini2dx.org/content/repositories/snapshots") {
-					if(project.hasProperty('mini2DxMavenUser')) {
-						authentication(userName: project.property('mini2DxMavenUser'), password: project.property('mini2DxMavenPassword'))
-					}
-				}
-			}
-		}
-	}
+	apply plugin: "java"
+	apply plugin: "signing"
+	apply plugin: "maven"
 	
 	repositories {
 		mavenLocal()
 		mavenCentral()
+		maven { url "https://mini2dx.org/maven/content/repositories/thirdparty" }
+	}
+	
+	group = 'org.mini2Dx'
+	version = '3.0.1-SNAPSHOT'
+	
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
+	
+	task javadocJar(type: Jar) {
+		classifier = 'javadoc'
+		from javadoc
+	}
+
+	task sourcesJar(type: Jar) {
+		classifier = 'sources'
+		from sourceSets.main.allSource
+	}
+	
+	artifacts {
+		archives javadocJar, sourcesJar
+	}
+	
+	// Maven Central publication
+	if(project.hasProperty('ossrhUser')) {
+		signing {
+			sign configurations.archives
+		}
+		
+		uploadArchives {
+			repositories {
+				mavenDeployer {
+					// POM signature
+					beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+					// Target repository
+					repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+						authentication(userName: ossrhUser, password: ossrhPassword)
+					}
+					pom.project {
+						name project.name
+						description project.description
+						packaging 'jar'
+						url 'https://github.com/mini2Dx/tilepacker'
+	
+						scm {
+							connection 'scm:git:https://github.com/mini2Dx/tilepacker.git'
+							developerConnection 'scm:git:git@github.com:mini2Dx/tilepacker.git'
+							url 'https://github.com/mini2Dx/tilepacker.git'
+						}
+	
+						licenses {
+							license {
+								name 'The BSD 3-Clause License'
+								url 'https://opensource.org/licenses/BSD-3-Clause'
+								distribution 'repo'
+							}
+						}
+	
+						developers {
+							developer {
+								id = 'tomcashman'
+								name = 'Thomas Cashman'
+								email = 'thomascashman404@gmail.com'
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
