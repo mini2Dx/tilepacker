@@ -29,15 +29,7 @@ package org.tilepacker.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import org.newdawn.slick.AppGameContainer;
-import org.newdawn.slick.BasicGame;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.SpriteSheet;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
@@ -46,7 +38,7 @@ import org.simpleframework.xml.core.Persister;
  * 
  * @author Thomas Cashman
  */
-public class TilePacker extends BasicGame {
+public class TilePacker {
 	public static boolean FIX_TEARING = false;
 	public static String FORMAT = "PNG";
 	public static File TARGET_DIRECTORY;
@@ -59,7 +51,7 @@ public class TilePacker extends BasicGame {
 	 * Constructor
 	 */
 	public TilePacker(File configFile) {
-		super("TilePacker");
+		super();
 		this.configFileDir = configFile.getParent();
 		tilesets = new ArrayList<Tileset>();
 
@@ -89,24 +81,6 @@ public class TilePacker extends BasicGame {
 	}
 	
 	public void run(ClassLoader classLoader) {
-		AppGameContainer gc;
-		try {
-			NativeLoader.loadNatives(classLoader);
-			Input.disableControllers();
-			
-			gc = new AppGameContainer(this, Tileset.MAX_WIDTH, Tileset.MAX_HEIGHT, false);
-			gc.setForceExit(false);
-			gc.setSoundOn(false);
-			gc.setUpdateOnlyWhenVisible(false);
-			gc.setAlwaysRender(true);
-			gc.start();
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void init(GameContainer gc) throws SlickException {
 		tilesets.add(new Tileset());
 
 		for (int i = 0; i < inputFiles.size(); i++) {
@@ -119,8 +93,7 @@ public class TilePacker extends BasicGame {
 			if(!tileFile.exists()) {
 				throw new TilePackerException("ERROR: " + path + " does not exist");
 			}
-			SpriteSheet spriteSheet = new SpriteSheet(tileFile.getAbsolutePath(), Tile.WIDTH,
-					Tile.HEIGHT);
+			SplitImage spriteSheet = new SplitImage(tileFile, Tile.WIDTH, Tile.HEIGHT);
 
 			boolean added = false;
 			for (int j = 0; j < tilesets.size(); j++) {
@@ -147,13 +120,7 @@ public class TilePacker extends BasicGame {
 				tilesets.add(tileset);
 			}
 		}
-	}
-
-	@Override
-	public void update(GameContainer gc, int delta) throws SlickException {
-	}
-
-	public void render(GameContainer gc, Graphics g) throws SlickException {
+		
 		for (int i = 0; i < tilesets.size(); i++) {
 			Tileset tileset = tilesets.get(i);
 			if(tileset.isSaved()) {
@@ -162,7 +129,6 @@ public class TilePacker extends BasicGame {
 			System.out.println("INFO: Saving tileset - " + i);
 			tileset.save(new File(TARGET_DIRECTORY, i + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
 		}
-		gc.exit();
 	}
 
 	public static void main(String[] args) {

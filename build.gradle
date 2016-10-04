@@ -34,7 +34,7 @@ subprojects {
 	}
 	
 	group = 'org.mini2Dx'
-	version = '3.0.1'
+	version = '4.0.0-SNAPSHOT'
 	
 	sourceCompatibility = 1.7
 	targetCompatibility = 1.7

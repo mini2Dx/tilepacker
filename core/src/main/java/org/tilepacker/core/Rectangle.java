@@ -26,10 +26,7 @@
  */
 package org.tilepacker.core;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import org.newdawn.slick.SpriteSheet;
 
 /**
  * Represents available rectangle space for maxrects algorithm
@@ -47,16 +44,16 @@ public class Rectangle {
 		this.height = height;
 	}
 
-	public void addTiles(SpriteSheet sheet) {
-		tiles = new Tile[sheet.getHorizontalCount()][sheet.getVerticalCount()];
-		for (int x = 0; x < sheet.getHorizontalCount(); x++) {
-			for (int y = 0; y < sheet.getVerticalCount(); y++) {
+	public void addTiles(SplitImage sheet) {
+		tiles = new Tile[sheet.getHorizontalTileCount()][sheet.getVerticalTileCount()];
+		for (int x = 0; x < sheet.getHorizontalTileCount(); x++) {
+			for (int y = 0; y < sheet.getVerticalTileCount(); y++) {
 				tiles[x][y] = new Tile(sheet.getSubImage(x, y));
 			}
 		}
 
-		width = sheet.getHorizontalCount();
-		height = sheet.getVerticalCount();
+		width = sheet.getHorizontalTileCount();
+		height = sheet.getVerticalTileCount();
 	}
 	
 	public void dispose() {
@@ -124,11 +121,11 @@ public class Rectangle {
 		return result;
 	}
 
-	public boolean canContain(SpriteSheet sheet) {
-		if (sheet.getHorizontalCount() > width) {
+	public boolean canContain(SplitImage sheet) {
+		if (sheet.getHorizontalTileCount() > width) {
 			return false;
 		}
-		if (sheet.getVerticalCount() > height) {
+		if (sheet.getVerticalTileCount() > height) {
 			return false;
 		}
 		return true;

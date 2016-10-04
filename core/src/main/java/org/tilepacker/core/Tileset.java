@@ -26,16 +26,10 @@
  */
 package org.tilepacker.core;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.SpriteSheet;
-import org.newdawn.slick.imageout.ImageOut;
 
 /**
  * Stores a tileset
@@ -71,20 +65,20 @@ public class Tileset {
 	 *            The {@link Tile} to be added
 	 * @return True on success, false if the tileset is full
 	 */
-	public boolean add(SpriteSheet sheet) {
+	public boolean add(SplitImage image) {
 		if(saved) {
 			return false;
 		}
 		for (int i = 0; i < availableRectangles.size(); i++) {
 			Rectangle rect = availableRectangles.get(i);
-			if (!rect.canContain(sheet)) {
+			if (!rect.canContain(image)) {
 				continue;
 			}
 			Rectangle copyRect = new Rectangle(rect.getX(), rect.getY(),
 					rect.getWidth(), rect.getHeight());
 
 			availableRectangles.remove(i);
-			rect.addTiles(sheet);
+			rect.addTiles(image);
 			usedRectangles.add(rect);
 			availableRectangles.add(copyRect);
 
@@ -156,18 +150,17 @@ public class Tileset {
 	 *            The destination filepath
 	 * @param format
 	 *            The file format
-	 * @throws SlickException
 	 */
-	public void save(String destinationFile, String format)
-			throws SlickException {
+	public void save(String destinationFile, String format) {
 		if(saved) {
 			return;
 		}
-		Image tilesetImage = new Image(MAX_WIDTH, MAX_HEIGHT);
-		Graphics g = tilesetImage.getGraphics();
-		g.setColor(Color.magenta);
-		g.fillRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
-		g.setAntiAlias(true);
+//		Image tilesetImage = new Image(MAX_WIDTH, MAX_HEIGHT);
+//		Graphics g = tilesetImage.getGraphics();
+//		g.setColor(Color.magenta);
+//		g.fillRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
+//		g.setAntiAlias(true);
+		
 		for (int i = 0; i < usedRectangles.size(); i++) {
 			Rectangle rectangle = usedRectangles.get(i);
 
@@ -182,29 +175,29 @@ public class Tileset {
 					int renderY = ((tileY * (Tile.HEIGHT + (Tile.PADDING * 2))) + Tile.PADDING);
 
 					if (TilePacker.FIX_TEARING) {
-						g.setWorldClip(renderX - 2, renderY - 1, 2, Tile.HEIGHT + 2);
-						g.drawImage(tile.getTileImage(), renderX - 1, renderY);
-						g.clearWorldClip();
-						
-						g.setWorldClip(renderX + Tile.WIDTH, renderY - 1, 2, Tile.HEIGHT + 2);
-						g.drawImage(tile.getTileImage(), renderX  +1, renderY);
-						g.clearWorldClip();
-						
-						g.setWorldClip(renderX - 1, renderY - 2, Tile.WIDTH + 2, 2);
-						g.drawImage(tile.getTileImage(), renderX, renderY - 1);
-						g.clearWorldClip();
-						
-						g.setWorldClip(renderX - 1, renderY + Tile.HEIGHT, Tile.WIDTH + 2, 2);
-						g.drawImage(tile.getTileImage(), renderX, renderY + 1);
-						g.clearWorldClip();
+//						g.setWorldClip(renderX - 2, renderY - 1, 2, Tile.HEIGHT + 2);
+//						g.drawImage(tile.getTileImage(), renderX - 1, renderY);
+//						g.clearWorldClip();
+//						
+//						g.setWorldClip(renderX + Tile.WIDTH, renderY - 1, 2, Tile.HEIGHT + 2);
+//						g.drawImage(tile.getTileImage(), renderX  +1, renderY);
+//						g.clearWorldClip();
+//						
+//						g.setWorldClip(renderX - 1, renderY - 2, Tile.WIDTH + 2, 2);
+//						g.drawImage(tile.getTileImage(), renderX, renderY - 1);
+//						g.clearWorldClip();
+//						
+//						g.setWorldClip(renderX - 1, renderY + Tile.HEIGHT, Tile.WIDTH + 2, 2);
+//						g.drawImage(tile.getTileImage(), renderX, renderY + 1);
+//						g.clearWorldClip();
 					}
 
-					g.drawImage(tile.getTileImage(), renderX, renderY);
+//					g.drawImage(tile.getTileImage(), renderX, renderY);
 				}
 			}
 		}
-		g.flush();
-		ImageOut.write(tilesetImage, format, destinationFile);
+//		g.flush();
+//		ImageOut.write(tilesetImage, format, destinationFile);
 		for (int i = 0; i < usedRectangles.size(); i++) {
 			Rectangle rectangle = usedRectangles.get(i);
 			rectangle.dispose();

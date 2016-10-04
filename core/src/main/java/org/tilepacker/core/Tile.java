@@ -26,8 +26,7 @@
  */
 package org.tilepacker.core;
 
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
+
 
 /**
  * Stores a single tile
@@ -39,13 +38,13 @@ public class Tile {
 	public static int HEIGHT = 32;
 	public static int PADDING = 0;
 	
-	private Image tileImage;
+	private SplitImage tileImage;
 	
 	/**
 	 * Constructor
-	 * @param tileImage The tile's {@link Image} instance
+	 * @param tileImage The tile's backing image
 	 */
-	public Tile(Image tileImage) {
+	public Tile(SplitImage tileImage) {
 		this.tileImage = tileImage;
 	}
 
@@ -53,7 +52,7 @@ public class Tile {
 	 * The tile image
 	 * @return
 	 */
-	public Image getTileImage() {
+	public SplitImage getTileImage() {
 		return tileImage;
 	}
 	
@@ -61,13 +60,6 @@ public class Tile {
 	 * Cleans up used resources
 	 */
 	public void dispose() {
-		if(tileImage == null) {
-			return;
-		}
-		try {
-			tileImage.destroy();
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+		tileImage = null;
 	}
 }

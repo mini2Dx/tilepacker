@@ -35,7 +35,15 @@ public class SmallToLargeRectangleComparator implements Comparator<Rectangle> {
 
 	@Override
 	public int compare(Rectangle o1, Rectangle o2) {
-		return Integer.compare(o1.getArea(), o2.getArea());
+		int sizeComparison = Integer.compare(o1.getArea(), o2.getArea());
+		if(sizeComparison == 0) {
+			int xComparison = Integer.compare(o1.getX(), o2.getX());
+			if(xComparison == 0) {
+				return Integer.compare(o1.getY(), o2.getY());
+			}
+			return xComparison;
+		}
+		return sizeComparison;
 	}
 
 }
