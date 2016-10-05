@@ -44,7 +44,7 @@ public class Rectangle {
 		this.height = height;
 	}
 
-	public void addTiles(SplitImage sheet) {
+	public void addTiles(TileImage sheet) {
 		tiles = new Tile[sheet.getHorizontalTileCount()][sheet.getVerticalTileCount()];
 		for (int x = 0; x < sheet.getHorizontalTileCount(); x++) {
 			for (int y = 0; y < sheet.getVerticalTileCount(); y++) {
@@ -121,7 +121,7 @@ public class Rectangle {
 		return result;
 	}
 
-	public boolean canContain(SplitImage sheet) {
+	public boolean canContain(TileImage sheet) {
 		if (sheet.getHorizontalTileCount() > width) {
 			return false;
 		}

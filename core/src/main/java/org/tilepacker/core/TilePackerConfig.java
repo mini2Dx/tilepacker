@@ -53,6 +53,10 @@ public class TilePackerConfig {
 	private String outputPath = "./";
 	@Element
 	private boolean preventTearing = false;
+	@Element
+	private boolean premultiplyAlpha = false;
+	@Element
+	private String backgroundColor = null;
 	@ElementList(name="tiles")
 	private List<String> tiles;
 	
@@ -118,6 +122,22 @@ public class TilePackerConfig {
 	
 	public void setPreventTearing(boolean preventTearing) {
 		this.preventTearing = preventTearing;
+	}
+
+	public boolean isPremultiplyAlpha() {
+		return premultiplyAlpha;
+	}
+
+	public void setPremultiplyAlpha(boolean premultiplyAlpha) {
+		this.premultiplyAlpha = premultiplyAlpha;
+	}
+
+	public String getBackgroundColor() {
+		return backgroundColor;
+	}
+
+	public void setBackgroundColor(String backgroundColor) {
+		this.backgroundColor = backgroundColor;
 	}
 
 	public List<String> getTiles() {

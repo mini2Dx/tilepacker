@@ -13,8 +13,8 @@ import javax.imageio.ImageIO;
  *
  * @author Thomas Cashman
  */
-public class SplitImage {
-	private final SplitImage parent;
+public class TileImage {
+	private final TileImage parent;
 	private final File file;
 
 	private final int tileX, tileY, tileWidth, tileHeight;
@@ -23,7 +23,7 @@ public class SplitImage {
 
 	private BufferedImage image;
 
-	public SplitImage(File imageFile, int tileWidth, int tileHeight) {
+	public TileImage(File imageFile, int tileWidth, int tileHeight) {
 		this.parent = null;
 		this.file = imageFile;
 
@@ -41,7 +41,7 @@ public class SplitImage {
 		dispose();
 	}
 
-	public SplitImage(SplitImage parent, int tileX, int tileY, int horizontalTiles, int verticalTiles) {
+	public TileImage(TileImage parent, int tileX, int tileY, int horizontalTiles, int verticalTiles) {
 		this.parent = parent;
 		this.image = null;
 		this.file = null;
@@ -101,8 +101,8 @@ public class SplitImage {
 		return heightInPixels;
 	}
 
-	public SplitImage getSubImage(int x, int y) {
-		return new SplitImage(this, tileX + x, tileY + y, 1, 1);
+	public TileImage getSubImage(int x, int y) {
+		return new TileImage(this, tileX + x, tileY + y, 1, 1);
 	}
 
 	public BufferedImage getBackingImage() {

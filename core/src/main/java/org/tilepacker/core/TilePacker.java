@@ -27,6 +27,7 @@
 package org.tilepacker.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class TilePacker {
 		inputFiles = config.getTiles();
 	}
 	
-	public void run(ClassLoader classLoader) {
+	public void run(ClassLoader classLoader) throws IOException {
 		tilesets.add(new Tileset());
 
 		for (int i = 0; i < inputFiles.size(); i++) {
@@ -93,7 +94,7 @@ public class TilePacker {
 			if(!tileFile.exists()) {
 				throw new TilePackerException("ERROR: " + path + " does not exist");
 			}
-			SplitImage spriteSheet = new SplitImage(tileFile, Tile.WIDTH, Tile.HEIGHT);
+			TileImage spriteSheet = new TileImage(tileFile, Tile.WIDTH, Tile.HEIGHT);
 
 			boolean added = false;
 			for (int j = 0; j < tilesets.size(); j++) {
@@ -136,6 +137,10 @@ public class TilePacker {
 			System.err.println("Usage: java -jar tilepacker-core-standalone.jar ./path/to/config.xml");
 			System.exit(0);
 		}
-		new TilePacker(new File(args[0])).run(TilePacker.class.getClassLoader());
+		try {
+			new TilePacker(new File(args[0])).run(TilePacker.class.getClassLoader());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

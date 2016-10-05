@@ -38,13 +38,13 @@ public class Tile {
 	public static int HEIGHT = 32;
 	public static int PADDING = 0;
 	
-	private SplitImage tileImage;
+	private TileImage tileImage;
 	
 	/**
 	 * Constructor
 	 * @param tileImage The tile's backing image
 	 */
-	public Tile(SplitImage tileImage) {
+	public Tile(TileImage tileImage) {
 		this.tileImage = tileImage;
 	}
 
@@ -52,7 +52,7 @@ public class Tile {
 	 * The tile image
 	 * @return
 	 */
-	public SplitImage getTileImage() {
+	public TileImage getTileImage() {
 		return tileImage;
 	}
 	
