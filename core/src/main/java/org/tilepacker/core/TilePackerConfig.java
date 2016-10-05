@@ -45,17 +45,17 @@ public class TilePackerConfig {
 	private int tilesetWidth = 512;
 	@Element
 	private int tilesetHeight = 512;
-	@Element
+	@Element(required=false)
 	private int tilePadding = 0;
 	@Element
 	private String outputFormat = "PNG";
 	@Element
 	private String outputPath = "./";
-	@Element
+	@Element(required=false)
 	private boolean preventTearing = false;
-	@Element
+	@Element(required=false)
 	private boolean premultiplyAlpha = false;
-	@Element
+	@Element(required=false)
 	private String backgroundColor = null;
 	@ElementList(name="tiles")
 	private List<String> tiles;

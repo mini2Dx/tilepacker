@@ -26,6 +26,7 @@
  */
 package org.tilepacker.core;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +44,8 @@ import javax.imageio.ImageIO;
 public class Tileset {
 	public static int MAX_WIDTH;
 	public static int MAX_HEIGHT;
+	public static boolean PREMULTIPLY_ALPHA = false;
+	public static String BACKGROUND_COLOR = null;
 
 	private final SmallToLargeRectangleComparator rectangleComparator = new SmallToLargeRectangleComparator();
 	private final List<Rectangle> tmpRemaining = new ArrayList<Rectangle>(1);
@@ -161,6 +164,16 @@ public class Tileset {
 			return;
 		}
 		BufferedImage canvas = new BufferedImage(Tileset.MAX_WIDTH, Tileset.MAX_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		if(BACKGROUND_COLOR != null) {
+			String [] colorComponents = BACKGROUND_COLOR.split(",");
+			if(colorComponents.length != 3) {
+				throw new TilePackerException("Background color must be in format R,G,B");
+			}
+			Color color = new Color(Integer.parseInt(colorComponents[0]), 
+					Integer.parseInt(colorComponents[1]), 
+					Integer.parseInt(colorComponents[2]));
+			drawToImage(canvas, 0, 0, canvas.getWidth(), canvas.getHeight(), color.getRGB());
+		}
 		
 		for (int i = 0; i < usedRectangles.size(); i++) {
 			Rectangle rectangle = usedRectangles.get(i);
@@ -192,8 +205,12 @@ public class Tileset {
 				}
 			}
 		}
+		
 		switch(format.toLowerCase()) {
 		case "png":
+			if(PREMULTIPLY_ALPHA) {
+				canvas.getColorModel().coerceData(canvas.getRaster(), true);
+			}
 			ImageIO.write(canvas, "png", new File(destinationFile));
 			break;
 		case "jpg":
@@ -235,6 +252,27 @@ public class Tileset {
 					continue;
 				}
 				destination.setRGB(destX, destY, source.getRGB(x, y));
+			}
+		}
+	}
+	
+	private void drawToImage(BufferedImage destination, int destinationX, int destinationY, int destinationWidth, int destinationHeight, int rgb) {
+		for(int x = destinationX; x < destinationWidth; x++) {
+			if(x < 0) {
+				continue;
+			}
+			if(x >= destination.getWidth()) {
+				continue;
+			}
+			
+			for(int y = destinationY; y < destinationHeight; y++) {
+				if(y < 0) {
+					continue;
+				}
+				if(y >= destination.getHeight()) {
+					continue;
+				}
+				destination.setRGB(x, y, rgb);
 			}
 		}
 	}

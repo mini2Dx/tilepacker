@@ -7,6 +7,8 @@
    <outputFormat>PNG</outputFormat>
    <outputPath>./</outputPath>
    <preventTearing>true</preventTearing>
+   <premultiplyAlpha>false</premultiplyAlpha>
+   <backgroundColor>255,0,255</backgroundColor>
    <tiles class="java.util.ArrayList">
       <string>./tile1.png</string>
       <string>./tile2.png</string>

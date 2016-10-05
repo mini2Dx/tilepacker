@@ -70,6 +70,9 @@ public class TilePacker {
 
 		Tileset.MAX_WIDTH = config.getTilesetWidth();
 		Tileset.MAX_HEIGHT = config.getTilesetHeight();
+		
+		Tileset.PREMULTIPLY_ALPHA = config.isPremultiplyAlpha();
+		Tileset.BACKGROUND_COLOR = config.getBackgroundColor();
 
 		TilePacker.FIX_TEARING = config.isPreventTearing();
 		if(TilePacker.FIX_TEARING && Tile.PADDING < 1) {

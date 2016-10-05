@@ -55,16 +55,21 @@ Mac OS X / Linux
 ```
 
 
-Configuration Options
+Required Configuration Options
 ---------
  * ```tileWidth``` - The width of each tile in pixels
  * ```tileHeight``` - The height of each tile in pixels
  * ```tilesetWidth``` - The width of each tileset in pixels
  * ```tilesetHeight``` - The height of each tileset in pixels
- * ```tilePadding``` - The padding in pixels to apply around each tile
- * ```outputFormat```- The output image format (PNG, JPG or TGA)
- * ```preventTearing``` - If you want to prevent tearing when scaling rendering, TilePacker can pad out each tile by its border pixels
+ * ```outputFormat```- The output image format (PNG or JPG)
  * ```tiles``` - The list of relative paths to tile images to be packed
+ 
+Optional Configuration Options
+---------
+ * ```tilePadding``` - The padding in pixels to apply around each tile (0 by default)
+ * ```preventTearing``` - If you want to prevent tearing when scaling rendering, TilePacker can pad out each tile by its border pixels (false by default)
+  * ```premultiplyAlpha``` - If you want the output image to have premultiplied alpha values (false by default)
+   * ```backgroundColor``` - The background color to use in output images
 
 Notes
 ---------
