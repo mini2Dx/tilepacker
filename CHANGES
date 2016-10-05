@@ -1,6 +1,7 @@
 [4.0.0]
 - Removed Slick dependency, images now generate in headless JVM
 - Added backgroundColor and premultiplyAlpha options
+- Packing algorithm now packs from top-left corner outwards
 
 [3.0.1]
 - Improved memory consumption
