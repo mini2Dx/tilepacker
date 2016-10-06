@@ -29,7 +29,9 @@ package org.tilepacker.core;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
@@ -53,6 +55,7 @@ public class TilePacker {
 	 */
 	public TilePacker(File configFile) {
 		super();
+		
 		this.configFileDir = configFile.getParent();
 		tilesets = new ArrayList<Tileset>();
 
@@ -80,12 +83,13 @@ public class TilePacker {
 		}
 		TilePacker.FORMAT = config.getOutputFormat();
 		TilePacker.TARGET_DIRECTORY = new File(configFile.getParent(), config.getOutputPath());
-
 		inputFiles = config.getTiles();
 	}
 	
 	public void run(ClassLoader classLoader) throws IOException {
 		tilesets.add(new Tileset());
+		
+		Queue<TileImage> imagesToPack = new LinkedList<TileImage>();
 
 		for (int i = 0; i < inputFiles.size(); i++) {
 			String path = inputFiles.get(i);
@@ -97,15 +101,20 @@ public class TilePacker {
 			if(!tileFile.exists()) {
 				throw new TilePackerException("ERROR: " + path + " does not exist");
 			}
-			TileImage spriteSheet = new TileImage(tileFile, Tile.WIDTH, Tile.HEIGHT);
-
+			TileImage spriteSheet = new TileImage(tileFile, path);
+			addToQueue(imagesToPack, spriteSheet);
+		}
+		
+		while(!imagesToPack.isEmpty()) {
+			TileImage nextImage = imagesToPack.poll();
+			
 			boolean added = false;
 			for (int j = 0; j < tilesets.size(); j++) {
 				Tileset tileset = tilesets.get(j);
 
-				if (tileset.add(spriteSheet)) {
+				if (tileset.add(nextImage)) {
 					added = true;
-					System.out.println("INFO: Added " + path + " to tileset " + j);
+					System.out.println("INFO: Added " + nextImage.getFilepath() + " to tileset " + j);
 					
 					if (tileset.isFull()) {
 						System.out.println("INFO: Tileset " + j + " is now full. Saving to disk.");
@@ -117,10 +126,10 @@ public class TilePacker {
 
 			if (!added) {
 				Tileset tileset = new Tileset();
-				if (!tileset.add(spriteSheet)) {
-					throw new TilePackerException("ERROR: Image too large - " + path);
+				if (!tileset.add(nextImage)) {
+					throw new TilePackerException("ERROR: Tile image too large");
 				}
-				System.out.println("INFO: Added " + path + " to tileset " + tilesets.size());
+				System.out.println("INFO: Added " + nextImage.getFilepath() + " to tileset " + tilesets.size());
 				tilesets.add(tileset);
 			}
 		}
@@ -132,6 +141,23 @@ public class TilePacker {
 			}
 			System.out.println("INFO: Saving tileset - " + i);
 			tileset.save(new File(TARGET_DIRECTORY, i + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
+		}
+	}
+	
+	public void addToQueue(Queue<TileImage> queue, TileImage tileImage) {
+		int horizontalTileCount = tileImage.getHorizontalTileCount();
+		int verticalTileCount = tileImage.getVerticalTileCount();
+		
+		if(horizontalTileCount > Tileset.getMaximumWidthInTiles()) {
+			int halfWidth = horizontalTileCount / 2;
+			addToQueue(queue, TileImage.getSubImage(tileImage, 0, 0, halfWidth, verticalTileCount));
+			addToQueue(queue, TileImage.getSubImage(tileImage, halfWidth, 0, horizontalTileCount - halfWidth, verticalTileCount));
+		} else if(verticalTileCount > Tileset.getMaxiumumHeightInTiles()) {
+			int halfHeight = verticalTileCount / 2;
+			addToQueue(queue, TileImage.getSubImage(tileImage, 0, 0, horizontalTileCount, halfHeight));
+			addToQueue(queue, TileImage.getSubImage(tileImage, 0, halfHeight, horizontalTileCount, verticalTileCount - halfHeight));
+		} else {
+			queue.add(tileImage);
 		}
 	}
 

@@ -192,15 +192,15 @@ public class Tileset {
 
 					if (TilePacker.FIX_TEARING) {
 						//Left
-						drawToImage(image.getBackingImage(), 0, 0, 1, Tile.HEIGHT, canvas, renderX - 1, renderY);
+						drawToImage(image.getCutImage(), 0, 0, 1, Tile.HEIGHT, canvas, renderX - 1, renderY);
 						//Right
-						drawToImage(image.getBackingImage(), Tile.WIDTH - 1, 0, 1, Tile.HEIGHT, canvas, renderX + Tile.WIDTH, renderY);
+						drawToImage(image.getCutImage(), Tile.WIDTH - 1, 0, 1, Tile.HEIGHT, canvas, renderX + Tile.WIDTH, renderY);
 						//Top
-						drawToImage(image.getBackingImage(), 0, 0, Tile.WIDTH, 1, canvas, renderX, renderY - 1);
+						drawToImage(image.getCutImage(), 0, 0, Tile.WIDTH, 1, canvas, renderX, renderY - 1);
 						//Bottom
-						drawToImage(image.getBackingImage(), 0, Tile.HEIGHT - 1, Tile.WIDTH, 1, canvas, renderX, renderY + Tile.HEIGHT);
+						drawToImage(image.getCutImage(), 0, Tile.HEIGHT - 1, Tile.WIDTH, 1, canvas, renderX, renderY + Tile.HEIGHT);
 					}
-					drawToImage(image.getBackingImage(), 0, 0, Tile.WIDTH, Tile.HEIGHT, canvas, renderX, renderY);
+					drawToImage(image.getCutImage(), 0, 0, Tile.WIDTH, Tile.HEIGHT, canvas, renderX, renderY);
 					image.dispose();
 				}
 			}

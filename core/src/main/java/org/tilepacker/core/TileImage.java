@@ -16,65 +16,73 @@ import javax.imageio.ImageIO;
 public class TileImage {
 	private final TileImage parent;
 	private final File file;
+	private final String filepath;
 
-	private final int tileX, tileY, tileWidth, tileHeight;
+	private final int tileX, tileY;
 	private final int horizontalTileCount, verticalTileCount;
 	private final int widthInPixels, heightInPixels;
 
-	private BufferedImage image;
+	private BufferedImage originalImage, cutImage;
 
-	public TileImage(File imageFile, int tileWidth, int tileHeight) {
+	public TileImage(File imageFile, String path) {
 		this.parent = null;
 		this.file = imageFile;
+		this.filepath = path;
 
 		loadImage();
 
 		this.tileX = 0;
 		this.tileY = 0;
-		this.tileWidth = tileWidth;
-		this.tileHeight = tileHeight;
-		this.widthInPixels = image.getWidth();
-		this.heightInPixels = image.getHeight();
-		this.horizontalTileCount = widthInPixels / tileWidth;
-		this.verticalTileCount = heightInPixels / tileHeight;
+		this.widthInPixels = originalImage.getWidth();
+		this.heightInPixels = originalImage.getHeight();
+		this.horizontalTileCount = widthInPixels / Tile.WIDTH;
+		this.verticalTileCount = heightInPixels / Tile.HEIGHT;
 
 		dispose();
 	}
 
 	public TileImage(TileImage parent, int tileX, int tileY, int horizontalTiles, int verticalTiles) {
 		this.parent = parent;
-		this.image = null;
-		this.file = null;
+		this.originalImage = null;
+		this.file = parent.getFile();
+		
+		String parentFilepath = parent.getFilepath();
+		if(parentFilepath.contains("split")) {
+			this.filepath = parentFilepath;
+		} else {
+			this.filepath = parentFilepath+ " (split)";
+		}
 
 		this.tileX = tileX;
 		this.tileY = tileY;
-		this.tileWidth = parent.tileWidth;
-		this.tileHeight = parent.tileHeight;
 		this.horizontalTileCount = horizontalTiles;
 		this.verticalTileCount = verticalTiles;
-		this.widthInPixels = parent.getTileWidthInPixels();
-		this.heightInPixels = parent.getTileHeightInPixels();
+		this.widthInPixels = horizontalTiles * Tile.WIDTH;
+		this.heightInPixels = verticalTiles * Tile.HEIGHT;
 	}
 
 	public void loadImage() {
 		if (parent == null) {
 			try {
-				if (image == null) {
-					image = ImageIO.read(file);
+				if (originalImage == null) {
+					originalImage = ImageIO.read(file);
+				}
+				if (cutImage == null) {
+					cutImage = originalImage;
 				}
 			} catch (IOException ex) {
 				throw new RuntimeException("Error reading image: " + file, ex);
 			}
 		} else {
 			parent.loadImage();
-			image = parent.getBackingImage().getSubimage(tileX * tileWidth, tileY * tileHeight,
-					horizontalTileCount * tileWidth, verticalTileCount * tileHeight);
+			cutImage = parent.getOriginalImage().getSubimage(tileX * Tile.WIDTH, tileY * Tile.HEIGHT,
+					horizontalTileCount * Tile.WIDTH, verticalTileCount * Tile.HEIGHT);
 			parent.dispose();
 		}
 	}
 
 	public void dispose() {
-		image = null;
+		cutImage = null;
 	}
 
 	public int getTileX() {
@@ -93,19 +101,42 @@ public class TileImage {
 		return verticalTileCount;
 	}
 
-	public int getTileWidthInPixels() {
+	public int getWidthInPixels() {
 		return widthInPixels;
 	}
 
-	public int getTileHeightInPixels() {
+	public int getHeightInPixels() {
 		return heightInPixels;
 	}
 
 	public TileImage getSubImage(int x, int y) {
-		return new TileImage(this, tileX + x, tileY + y, 1, 1);
+		return getSubImage(x, y, 1, 1);
+	}
+	
+	public TileImage getSubImage(int x, int y, int width, int height) {
+		return getSubImage(this, x, y, width, height);
+	}
+	
+	public static TileImage getSubImage(TileImage parent, int x, int y, int width, int height) {
+		return new TileImage(parent, parent.getTileX() + x, parent.getTileY() + y, width, height);
 	}
 
-	public BufferedImage getBackingImage() {
-		return image;
+	public BufferedImage getOriginalImage() {
+		if(parent == null) {
+			return originalImage;
+		}
+		return parent.getOriginalImage();
+	}
+	
+	public BufferedImage getCutImage() {
+		return cutImage;
+	}
+	
+	public File getFile() {
+		return file;
+	}
+
+	public String getFilepath() {
+		return filepath;
 	}
 }
