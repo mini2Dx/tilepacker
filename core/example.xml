@@ -1,12 +1,19 @@
 <tilePackerConfig>
-   <tileWidth>32</tileWidth>
-   <tileHeight>32</tileHeight>
+   <tileWidth>8</tileWidth>
+   <tileHeight>8</tileHeight>
    <tilesetWidth>512</tilesetWidth>
    <tilesetHeight>512</tilesetHeight>
    <tilePadding>2</tilePadding>
    <outputFormat>PNG</outputFormat>
+   <outputPath>../core/assets/maps</outputPath>
    <preventTearing>true</preventTearing>
+   <premultiplyAlpha>true</premultiplyAlpha>
    <tiles class="java.util.ArrayList">
-      <string>example.png</string>
+      <tileConfig>
+         <path>example.png</path>
+      </tileConfig>
+      <tileConfig>
+         <path>subfolder/example.png</path>
+      </tileConfig>
    </tiles>
 </tilePackerConfig>

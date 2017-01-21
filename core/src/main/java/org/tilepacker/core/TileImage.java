@@ -16,56 +16,67 @@ import javax.imageio.ImageIO;
 public class TileImage {
 	private final TileImage parent;
 	private final File file;
-	private final String filepath;
-
-	private final int tileX, tileY;
-	private final int horizontalTileCount, verticalTileCount;
+	private final TileConfig tileConfig;
+	private final TilePlacement placement;
+	
 	private final int widthInPixels, heightInPixels;
 
 	private BufferedImage originalImage, cutImage;
 
-	public TileImage(File imageFile, String path) {
+	public TileImage(TileConfig tileConfig, File imageFile) {
 		this.parent = null;
 		this.file = imageFile;
-		this.filepath = path;
+		this.tileConfig = tileConfig;
 
 		loadImage();
-
-		this.tileX = 0;
-		this.tileY = 0;
+		
 		this.widthInPixels = originalImage.getWidth();
 		this.heightInPixels = originalImage.getHeight();
-		this.horizontalTileCount = widthInPixels / Tile.WIDTH;
-		this.verticalTileCount = heightInPixels / Tile.HEIGHT;
+		
+		placement = new TilePlacement();
+		placement.setSubImageX(0);
+		placement.setSubImageY(0);
+		placement.setSubImageWidth(widthInPixels / Tile.WIDTH);
+		placement.setSubImageHeight(heightInPixels / Tile.HEIGHT);
 
 		dispose();
 	}
+	
+	public TileImage(TileConfig tileConfig, File imageFile, TilePlacement placement) {
+		this.parent = null;
+		this.file = imageFile;
+		this.tileConfig = tileConfig;
+		this.placement = placement;
+		this.widthInPixels = placement.getSubImageWidth() * Tile.WIDTH;
+		this.heightInPixels = placement.getSubImageHeight() * Tile.HEIGHT;
+	}
 
-	public TileImage(TileImage parent, int tileX, int tileY, int horizontalTiles, int verticalTiles) {
+	public TileImage(TileImage parent, TilePlacement placement) {
 		this.parent = parent;
 		this.originalImage = null;
 		this.file = parent.getFile();
+		this.tileConfig = parent.getTileConfig();
+		this.placement = placement;
 		
-		String parentFilepath = parent.getFilepath();
-		if(parentFilepath.contains("split")) {
-			this.filepath = parentFilepath;
-		} else {
-			this.filepath = parentFilepath+ " (split)";
-		}
-
-		this.tileX = tileX;
-		this.tileY = tileY;
-		this.horizontalTileCount = horizontalTiles;
-		this.verticalTileCount = verticalTiles;
-		this.widthInPixels = horizontalTiles * Tile.WIDTH;
-		this.heightInPixels = verticalTiles * Tile.HEIGHT;
+		this.widthInPixels = placement.getSubImageWidth() * Tile.WIDTH;
+		this.heightInPixels = placement.getSubImageHeight() * Tile.HEIGHT;
+	}
+	
+	public void storePlacementConfig() {
+		tileConfig.getPlacement().add(placement);
 	}
 
 	public void loadImage() {
 		if (parent == null) {
 			try {
 				if (originalImage == null) {
-					originalImage = ImageIO.read(file);
+					BufferedImage image = ImageIO.read(file);
+					if(image.getType() != BufferedImage.TYPE_4BYTE_ABGR) {
+						BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+						newImage.getGraphics().drawImage(image, 0, 0, null);
+						image = newImage;
+					}
+					originalImage = image;
 				}
 				if (cutImage == null) {
 					cutImage = originalImage;
@@ -75,8 +86,8 @@ public class TileImage {
 			}
 		} else {
 			parent.loadImage();
-			cutImage = parent.getOriginalImage().getSubimage(tileX * Tile.WIDTH, tileY * Tile.HEIGHT,
-					horizontalTileCount * Tile.WIDTH, verticalTileCount * Tile.HEIGHT);
+			cutImage = parent.getOriginalImage().getSubimage(placement.getSubImageX() * Tile.WIDTH, placement.getSubImageY() * Tile.HEIGHT,
+					placement.getSubImageWidth() * Tile.WIDTH, placement.getSubImageHeight() * Tile.HEIGHT);
 			parent.dispose();
 		}
 	}
@@ -84,21 +95,49 @@ public class TileImage {
 	public void dispose() {
 		cutImage = null;
 	}
-
-	public int getTileX() {
-		return tileX;
+	
+	public boolean isPlaced() {
+		return placement.isPlaced();
+	}
+	
+	public int getTileset() {
+		return placement.getTileset();
+	}
+	
+	public void setTileset(int tileset) {
+		placement.setTileset(tileset);
 	}
 
-	public int getTileY() {
-		return tileY;
+	public int getTilesetX() {
+		return placement.getTilesetX();
+	}
+	
+	public void setTilesetX(int tilesetX) {
+		placement.setTilesetX(tilesetX);
 	}
 
+	public int getTilesetY() {
+		return placement.getTilesetY();
+	}
+	
+	public void setTilesetY(int tilesetY) {
+		placement.setTilesetY(tilesetY);
+	}
+	
+	public int getSubImageX() {
+		return placement.getSubImageX();
+	}
+
+	public int getSubImageY() {
+		return placement.getSubImageY();
+	}
+	
 	public int getHorizontalTileCount() {
-		return horizontalTileCount;
+		return placement.getSubImageWidth();
 	}
 
 	public int getVerticalTileCount() {
-		return verticalTileCount;
+		return placement.getSubImageHeight();
 	}
 
 	public int getWidthInPixels() {
@@ -118,7 +157,12 @@ public class TileImage {
 	}
 	
 	public static TileImage getSubImage(TileImage parent, int x, int y, int width, int height) {
-		return new TileImage(parent, parent.getTileX() + x, parent.getTileY() + y, width, height);
+		TilePlacement placement = new TilePlacement();
+		placement.setSubImageX(parent.getPlacement().getSubImageX() + x);
+		placement.setSubImageY(parent.getPlacement().getSubImageY() + y);
+		placement.setSubImageWidth(width);
+		placement.setSubImageHeight(height);
+		return new TileImage(parent, placement);
 	}
 
 	public BufferedImage getOriginalImage() {
@@ -136,7 +180,11 @@ public class TileImage {
 		return file;
 	}
 
-	public String getFilepath() {
-		return filepath;
+	public TileConfig getTileConfig() {
+		return tileConfig;
+	}
+
+	public TilePlacement getPlacement() {
+		return placement;
 	}
 }

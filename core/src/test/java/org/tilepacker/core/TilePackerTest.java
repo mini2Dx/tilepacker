@@ -54,6 +54,8 @@ public class TilePackerTest {
 	private TileImage tileImage;
 	
 	private TilePackerConfig config;
+	private TileConfig tileConfig;
+	private TilePlacement tilePlacement;
 	private File configFile;
 	
 	@Before
@@ -68,7 +70,12 @@ public class TilePackerTest {
 		config.setTileHeight(TILE_HEIGHT);
 		config.setTilesetWidth(TILESET_WIDTH);
 		config.setTilesetHeight(TILESET_HEIGHT);
-		config.setTiles(new ArrayList<String>(1));
+		config.setTiles(new ArrayList<TileConfig>(1));
+		
+		tileConfig = new TileConfig();
+		tileConfig.setPath("");
+		
+		tilePlacement = new TilePlacement();
 		
 		configFile = TilePackerTestUtils.createTestConfigFile(config);
 		
@@ -98,7 +105,7 @@ public class TilePackerTest {
 		
 		final Queue<TileImage> queue = new LinkedList<TileImage>();
 		
-		TilePacker tilePacker = new TilePacker(configFile);
+		TilePacker tilePacker = new TilePacker(configFile.getParent(), false);
 		tilePacker.addToQueue(queue, tileImage);
 		
 		Assert.assertEquals(1, queue.size());
@@ -109,18 +116,19 @@ public class TilePackerTest {
 		final int imageWidth = TILESET_WIDTH + (TILE_WIDTH * 2);
 		final int tileCount = (TILESET_WIDTH / TILE_WIDTH) + 2;
 		
+		tilePlacement.setSubImageWidth(tileCount);
+		tilePlacement.setSubImageHeight(1);
+		
 		mockery.checking(new Expectations() {
 			{
 				exactly(1).of(tileImage).getHorizontalTileCount();
 				will(returnValue(tileCount));
-				exactly(2).of(tileImage).getTileX();
-				will(returnValue(0));
-				exactly(2).of(tileImage).getTileY();
-				will(returnValue(0));
 				exactly(2).of(tileImage).getFile();
 				will(returnValue(null));
-				exactly(2).of(tileImage).getFilepath();
-				will(returnValue(""));
+				exactly(2).of(tileImage).getTileConfig();
+				will(returnValue(tileConfig));
+				atLeast(2).of(tileImage).getPlacement();
+				will(returnValue(tilePlacement));
 				oneOf(tileImage).getVerticalTileCount();
 				will(returnValue(1));
 			}
@@ -128,7 +136,7 @@ public class TilePackerTest {
 		
 		final Queue<TileImage> queue = new LinkedList<TileImage>();
 		
-		TilePacker tilePacker = new TilePacker(configFile);
+		TilePacker tilePacker = new TilePacker(configFile.getParent(), false);
 		tilePacker.addToQueue(queue, tileImage);
 		
 		Assert.assertEquals(2, queue.size());
@@ -148,26 +156,27 @@ public class TilePackerTest {
 		final int imageWidth = TILESET_WIDTH + TILE_WIDTH;
 		final int tileCount = (TILESET_WIDTH / TILE_WIDTH) + 1;
 		
+		tilePlacement.setSubImageWidth(tileCount);
+		tilePlacement.setSubImageHeight(1);
+		
 		mockery.checking(new Expectations() {
 			{
 				exactly(1).of(tileImage).getHorizontalTileCount();
 				will(returnValue(tileCount));
 				oneOf(tileImage).getVerticalTileCount();
 				will(returnValue(1));
-				exactly(2).of(tileImage).getTileX();
-				will(returnValue(0));
-				exactly(2).of(tileImage).getTileY();
-				will(returnValue(0));
 				exactly(2).of(tileImage).getFile();
 				will(returnValue(null));
-				exactly(2).of(tileImage).getFilepath();
-				will(returnValue(""));
+				exactly(2).of(tileImage).getTileConfig();
+				will(returnValue(tileConfig));
+				atLeast(2).of(tileImage).getPlacement();
+				will(returnValue(tilePlacement));
 			}
 		});
 		
 		final Queue<TileImage> queue = new LinkedList<TileImage>();
 		
-		TilePacker tilePacker = new TilePacker(configFile);
+		TilePacker tilePacker = new TilePacker(configFile.getParent(), false);
 		tilePacker.addToQueue(queue, tileImage);
 		
 		Assert.assertEquals(2, queue.size());
@@ -187,26 +196,27 @@ public class TilePackerTest {
 		final int imageHeight = TILESET_HEIGHT + (TILE_HEIGHT * 2);
 		final int tileCount = (TILESET_HEIGHT / TILE_HEIGHT) + 2;
 		
+		tilePlacement.setSubImageWidth(1);
+		tilePlacement.setSubImageHeight(tileCount);
+		
 		mockery.checking(new Expectations() {
 			{
 				exactly(1).of(tileImage).getHorizontalTileCount();
 				will(returnValue(1));
 				exactly(1).of(tileImage).getVerticalTileCount();
 				will(returnValue(tileCount));
-				exactly(2).of(tileImage).getTileX();
-				will(returnValue(0));
-				exactly(2).of(tileImage).getTileY();
-				will(returnValue(0));
 				exactly(2).of(tileImage).getFile();
 				will(returnValue(null));
-				exactly(2).of(tileImage).getFilepath();
-				will(returnValue(""));
+				exactly(2).of(tileImage).getTileConfig();
+				will(returnValue(tileConfig));
+				atLeast(2).of(tileImage).getPlacement();
+				will(returnValue(tilePlacement));
 			}
 		});
 		
 		final Queue<TileImage> queue = new LinkedList<TileImage>();
 		
-		TilePacker tilePacker = new TilePacker(configFile);
+		TilePacker tilePacker = new TilePacker(configFile.getParent(), false);
 		tilePacker.addToQueue(queue, tileImage);
 		
 		Assert.assertEquals(2, queue.size());
@@ -226,26 +236,27 @@ public class TilePackerTest {
 		final int imageHeight = TILESET_HEIGHT + TILE_HEIGHT;
 		final int tileCount = (TILESET_HEIGHT / TILE_HEIGHT) + 1;
 		
+		tilePlacement.setSubImageWidth(1);
+		tilePlacement.setSubImageHeight(tileCount);
+		
 		mockery.checking(new Expectations() {
 			{
 				exactly(1).of(tileImage).getHorizontalTileCount();
 				will(returnValue(1));
 				exactly(1).of(tileImage).getVerticalTileCount();
 				will(returnValue(tileCount));
-				exactly(2).of(tileImage).getTileX();
-				will(returnValue(0));
-				exactly(2).of(tileImage).getTileY();
-				will(returnValue(0));
 				exactly(2).of(tileImage).getFile();
 				will(returnValue(null));
-				exactly(2).of(tileImage).getFilepath();
-				will(returnValue(""));
+				exactly(2).of(tileImage).getTileConfig();
+				will(returnValue(tileConfig));
+				atLeast(2).of(tileImage).getPlacement();
+				will(returnValue(tilePlacement));
 			}
 		});
 		
 		final Queue<TileImage> queue = new LinkedList<TileImage>();
 		
-		TilePacker tilePacker = new TilePacker(configFile);
+		TilePacker tilePacker = new TilePacker(configFile.getParent(), false);
 		tilePacker.addToQueue(queue, tileImage);
 		
 		Assert.assertEquals(2, queue.size());

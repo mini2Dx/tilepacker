@@ -26,6 +26,8 @@
  */
 package org.tilepacker.core;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
@@ -57,8 +59,18 @@ public class TilePackerConfig {
 	private boolean premultiplyAlpha = false;
 	@Element(required=false)
 	private String backgroundColor = null;
-	@ElementList(name="tiles")
-	private List<String> tiles;
+	@ElementList(name="tiles", required=false)
+	private List<TileConfig> tiles;
+	
+	public boolean containsTileConfig(File tileDirectory, File file) {
+		String pathToLookup = TilePacker.getRelativePath(tileDirectory, file);
+		for(TileConfig config : tiles) {
+			if(config.getPath().equals(pathToLookup)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	public int getTileWidth() {
 		return tileWidth;
@@ -140,11 +152,14 @@ public class TilePackerConfig {
 		this.backgroundColor = backgroundColor;
 	}
 
-	public List<String> getTiles() {
+	public List<TileConfig> getTiles() {
+		if(tiles == null) {
+			tiles = new ArrayList<TileConfig>(1);
+		}
 		return tiles;
 	}
 
-	public void setTiles(List<String> tiles) {
+	public void setTiles(List<TileConfig> tiles) {
 		this.tiles = tiles;
 	}
 }

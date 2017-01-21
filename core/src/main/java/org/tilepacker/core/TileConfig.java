@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, Thomas Cashman
+ * Copyright (c) 2017, Thomas Cashman
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -24,26 +24,62 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.tilepacker.gradle
+package org.tilepacker.core;
 
-import java.awt.SystemTray
-import java.awt.TrayIcon
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
-import org.tilepacker.core.TilePacker
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
 
 /**
  *
  */
-class TilePackerTask extends DefaultTask {
-	File tilesDirectory;
-	boolean rewrite;
+public class TileConfig implements Comparable<TileConfig> {
+	@Element
+	private String path;
+	@ElementList(name="placement", required=false)
+	private List<TilePlacement> placement;
+	
+	public boolean isPlaced() {
+		if(placement == null || placement.isEmpty()) {
+			return false;
+		}
+		for(TilePlacement config : placement) {
+			if(!config.isPlaced()) {
+				return false;
+			}
+		}
+		return true;
+	}
 
-	@TaskAction
-	def packTiles() {
-		TilePacker tilePacker = new TilePacker(tilesDirectory, rewrite);
-		tilePacker.run(getClass().classLoader);
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public List<TilePlacement> getPlacement() {
+		if(placement == null) {
+			placement = new ArrayList<TilePlacement>(1);
+		}
+		return placement;
+	}
+
+	public void setPlacement(List<TilePlacement> placement) {
+		this.placement = placement;
+	}
+
+	@Override
+	public int compareTo(TileConfig o) {
+		if(isPlaced() && !o.isPlaced()) {
+			return -1;
+		}
+		if(!isPlaced() && o.isPlaced()) {
+			return 1;
+		}
+		return path.compareTo(o.path);
 	}
 }

@@ -38,7 +38,9 @@ import org.simpleframework.xml.core.Persister;
 public class TilePackerTestUtils {
 
 	public static File createTestConfigFile(TilePackerConfig tilePackerConfig) throws Exception {
-		File configFile = File.createTempFile(TilePackerTestUtils.class.getSimpleName(), ".xml");
+		File tmpFile = File.createTempFile(TilePackerTestUtils.class.getSimpleName(), ".xml");
+		File configFile = new File(tmpFile.getParent(), "config.xml");
+		tmpFile.renameTo(configFile);
 		Serializer serializer = new Persister();
 		serializer.write(tilePackerConfig, configFile);
 		return configFile;

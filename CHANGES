@@ -1,3 +1,6 @@
+[4.1.0]
+- XML config now stores previously generated data
+
 [4.0.0]
 - Removed Slick dependency, images now generate in headless JVM
 - Added backgroundColor and premultiplyAlpha options

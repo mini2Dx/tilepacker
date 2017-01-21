@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, Thomas Cashman
+ * Copyright (c) 2017, Thomas Cashman
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -24,26 +24,42 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.tilepacker.gradle
+package org.tilepacker.core;
 
-import java.awt.SystemTray
-import java.awt.TrayIcon
-import java.util.Set;
+import org.junit.Test;
 
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
-import org.tilepacker.core.TilePacker
+import junit.framework.Assert;
 
 /**
  *
  */
-class TilePackerTask extends DefaultTask {
-	File tilesDirectory;
-	boolean rewrite;
+public class TileImageTest {
+	
+	@Test
+	public void testSize() {
+		
+	}
 
-	@TaskAction
-	def packTiles() {
-		TilePacker tilePacker = new TilePacker(tilesDirectory, rewrite);
-		tilePacker.run(getClass().classLoader);
+	@Test
+	public void testGetSubImage() {
+		TileConfig tileConfig = new TileConfig();
+		TilePlacement tilePlacement = new TilePlacement();
+		tilePlacement.setSubImageWidth(4);
+		tilePlacement.setSubImageHeight(3);
+		tileConfig.getPlacement().add(tilePlacement);
+		
+		TileImage parentImage = new TileImage(tileConfig, null, tilePlacement);
+		
+		TileImage subImage1  = parentImage.getSubImage(0, 0, 2, 3);
+		Assert.assertEquals(0, subImage1.getSubImageX());
+		Assert.assertEquals(0, subImage1.getSubImageY());
+		Assert.assertEquals(2, subImage1.getHorizontalTileCount());
+		Assert.assertEquals(3, subImage1.getVerticalTileCount());
+		
+		TileImage subImage2  = parentImage.getSubImage(1, 2, 3, 2);
+		Assert.assertEquals(1, subImage2.getSubImageX());
+		Assert.assertEquals(2, subImage2.getSubImageY());
+		Assert.assertEquals(3, subImage2.getHorizontalTileCount());
+		Assert.assertEquals(2, subImage2.getVerticalTileCount());
 	}
 }

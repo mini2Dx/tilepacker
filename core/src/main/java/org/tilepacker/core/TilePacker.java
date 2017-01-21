@@ -46,26 +46,47 @@ public class TilePacker {
 	public static String FORMAT = "PNG";
 	public static File TARGET_DIRECTORY;
 
-	private final String configFileDir;
-	private final List<String> inputFiles;
+	private final Serializer serializer;
+	private final File configFile;
+	private final File configFileDir;
+	private final TilePackerConfig config;
+	private final List<TileConfig> inputFiles;
 	private List<Tileset> tilesets;
+	
+	/**
+	 * Constructor
+	 */
+	public TilePacker(String configFileDir, boolean rewrite) {
+		this(new File(configFileDir), rewrite);
+	}
 
 	/**
 	 * Constructor
 	 */
-	public TilePacker(File configFile) {
+	public TilePacker(File configFileDir, boolean rewrite) {
 		super();
 		
-		this.configFileDir = configFile.getParent();
+		this.configFileDir = configFileDir;
+		this.configFile = new File(configFileDir, "config.xml");
 		tilesets = new ArrayList<Tileset>();
 
-		Serializer serializer = new Persister();
-		TilePackerConfig config;
-		try {
-			config = serializer.read(TilePackerConfig.class, configFile);
-		} catch (Exception e) {
-			throw new TilePackerException("Error reading config file", e);
+		serializer = new Persister();
+		
+		if(configFile.exists()) {
+			try {
+				config = serializer.read(TilePackerConfig.class, configFile);
+				
+				if(rewrite) {
+					config.getTiles().clear();
+				}
+			} catch (Exception e) {
+				throw new TilePackerException("Error reading config file", e);
+			}
+		} else {
+			config = new TilePackerConfig();
+			config.setTiles(new ArrayList<TileConfig>());
 		}
+		findTileFiles(config, this.configFileDir);
 
 		Tile.WIDTH = config.getTileWidth();
 		Tile.HEIGHT = config.getTileHeight();
@@ -86,13 +107,30 @@ public class TilePacker {
 		inputFiles = config.getTiles();
 	}
 	
+	public void findTileFiles(TilePackerConfig config, File directory) {
+		for(File file : directory.listFiles()) {
+			if(file.isDirectory()) {
+				findTileFiles(config, file);
+			} else if(file.getAbsolutePath().toLowerCase().endsWith("png")
+					|| file.getAbsolutePath().toLowerCase().endsWith("jpg")) {
+				if(!config.containsTileConfig(configFileDir, file)) {
+					TileConfig tileConfig = new TileConfig();
+					tileConfig.setPath(getRelativePath(configFileDir, file));
+					config.getTiles().add(tileConfig);
+				}
+			}
+		}
+	}
+	
 	public void run(ClassLoader classLoader) throws IOException {
 		tilesets.add(new Tileset());
 		
 		Queue<TileImage> imagesToPack = new LinkedList<TileImage>();
 
 		for (int i = 0; i < inputFiles.size(); i++) {
-			String path = inputFiles.get(i);
+			TileConfig tileConfig = inputFiles.get(i);
+			
+			String path = tileConfig.getPath();
 			if (!path.endsWith("." + FORMAT.toLowerCase())) {
 				throw new TilePackerException("ERROR: " + path + " does not match format " + FORMAT.toLowerCase());
 			}
@@ -101,26 +139,52 @@ public class TilePacker {
 			if(!tileFile.exists()) {
 				throw new TilePackerException("ERROR: " + path + " does not exist");
 			}
-			TileImage spriteSheet = new TileImage(tileFile, path);
-			addToQueue(imagesToPack, spriteSheet);
+			
+			if(tileConfig.isPlaced()) {
+				for(int j = 0; j < tileConfig.getPlacement().size(); j++) {
+					TilePlacement tilePlacement = tileConfig.getPlacement().get(j);
+					TileImage spriteSheet = new TileImage(tileConfig, tileFile, tilePlacement);
+					addToQueue(imagesToPack, spriteSheet);
+				}
+			} else {
+				TileImage spriteSheet = new TileImage(tileConfig, tileFile);
+				addToQueue(imagesToPack, spriteSheet);
+			}
+			tileConfig.getPlacement().clear();
 		}
 		
 		while(!imagesToPack.isEmpty()) {
 			TileImage nextImage = imagesToPack.poll();
 			
 			boolean added = false;
-			for (int j = 0; j < tilesets.size(); j++) {
-				Tileset tileset = tilesets.get(j);
+			
+			if(nextImage.isPlaced()) {
+				while(nextImage.getTileset() >= tilesets.size()) {
+					tilesets.add(new Tileset());
+				}
+				Tileset tileset = tilesets.get(nextImage.getTileset());
+				tileset.add(nextImage);
+				added = true;
+				
+				if (tileset.isFull()) {
+					System.out.println("INFO: Tileset " + nextImage.getTileset() + " is now full. Saving to disk.");
+					tileset.save(new File(TARGET_DIRECTORY, nextImage.getTileset() + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
+				}
+			} else {
+				for (int j = 0; j < tilesets.size(); j++) {
+					Tileset tileset = tilesets.get(j);
 
-				if (tileset.add(nextImage)) {
-					added = true;
-					System.out.println("INFO: Added " + nextImage.getFilepath() + " to tileset " + j);
-					
-					if (tileset.isFull()) {
-						System.out.println("INFO: Tileset " + j + " is now full. Saving to disk.");
-						tileset.save(new File(TARGET_DIRECTORY, j + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
+					if (tileset.add(nextImage)) {
+						nextImage.setTileset(j);
+						added = true;
+						System.out.println("INFO: Added " + nextImage.getTileConfig().getPath() + " to tileset " + j);
+						
+						if (tileset.isFull()) {
+							System.out.println("INFO: Tileset " + j + " is now full. Saving to disk.");
+							tileset.save(new File(TARGET_DIRECTORY, j + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
+						}
+						break;
 					}
-					break;
 				}
 			}
 
@@ -129,9 +193,11 @@ public class TilePacker {
 				if (!tileset.add(nextImage)) {
 					throw new TilePackerException("ERROR: Tile image too large");
 				}
-				System.out.println("INFO: Added " + nextImage.getFilepath() + " to tileset " + tilesets.size());
+				System.out.println("INFO: Added " + nextImage.getTileConfig().getPath() + " to tileset " + tilesets.size());
 				tilesets.add(tileset);
+				nextImage.setTileset(tilesets.size() - 1);
 			}
+			nextImage.storePlacementConfig();
 		}
 		
 		for (int i = 0; i < tilesets.size(); i++) {
@@ -141,6 +207,12 @@ public class TilePacker {
 			}
 			System.out.println("INFO: Saving tileset - " + i);
 			tileset.save(new File(TARGET_DIRECTORY, i + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
+		}
+		
+		try {
+			serializer.write(config, configFile);
+		} catch (Exception e) {
+			throw new TilePackerException("Error storing placement config", e);
 		}
 	}
 	
@@ -163,13 +235,35 @@ public class TilePacker {
 
 	public static void main(String[] args) {
 		if(args.length == 0) {
-			System.err.println("Usage: java -jar tilepacker-core-standalone.jar ./path/to/config.xml");
-			System.exit(0);
+			TilePackerConfig config = new TilePackerConfig();
+			config.setTiles(new ArrayList<TileConfig>());
+			
+			Serializer serializer = new Persister();
+			File file = new File("config.xml");
+			try {
+				serializer.write(config, file);
+				System.out.println("Wrote example configuration to " + file.getAbsolutePath());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return;
 		}
 		try {
-			new TilePacker(new File(args[0])).run(TilePacker.class.getClassLoader());
+			if(args.length == 1) {
+				new TilePacker(args[0], false).run(TilePacker.class.getClassLoader());
+			} else {
+				new TilePacker(args[0], true).run(TilePacker.class.getClassLoader());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getRelativePath(File configDirectory, File imageFile) {
+		String configPath = configDirectory.getAbsolutePath();
+		if(!configPath.endsWith("/")) {
+			configPath += "/";
+		}
+		return imageFile.getAbsolutePath().replace(configPath, "");
 	}
 }
