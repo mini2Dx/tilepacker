@@ -6,8 +6,6 @@ A Gradle plugin and command line utility for packing individual tile images into
 Gradle
 ---------
 
-First, include the mini2Dx repositories in your buildscripts section. This is where tilepacker is deployed to.
-
 ```gradle
 buildscript {
     repositories {
@@ -15,16 +13,18 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-		classpath 'org.mini2Dx:tilepacker-gradle-plugin:3.0.1'
+		classpath 'org.mini2Dx:tilepacker-gradle-plugin:4.1.0'
     }
 }
 ```
 
-Then define a task for packing up your tiles into tilesets.
+Then define a task for packing up your tiles into tilesets. The tilesDirectory is where your tiles and configuration file are.
 
 ```gradle
 task tilePack(type: org.tilepacker.gradle.TilePackerTask) {
-	configFile file('config.xml')
+	tilesDirectory file("path/to/tiles/folder")
+	//Change to true if you do not want to use previously stored order of tiles
+	rewrite false
 }
 ```
 
@@ -38,20 +38,20 @@ A sample configuration file can be found [here](https://raw.githubusercontent.co
 
 Command Line
 ---------
-On the command line, the application takes a single argument - the path to the configuration file. The configuraiton file tells tilepacker which settings to apply and which files to pack into tilesets.
+On the command line, the application takes a single argument - the path to the directory of the tiles and configuration file. The configuraiton file tells tilepacker which settings to apply and which files to pack into tilesets.
 
 A sample configuration file can be found [here](https://raw.githubusercontent.com/tomcashman/tilepacker/master/config.sample.xml).
 
 Windows
 
 ```bash
-tilepacker-core.bat ./path/to/config.xml
+tilepacker-core.bat ./path/to/tiles/folder
 ```
 
 Mac OS X / Linux
 
 ```bash
-./tilepacker-core ./path/to/config.xml
+./tilepacker-core ./path/to/tiles/folder
 ```
 
 

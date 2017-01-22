@@ -1,5 +1,6 @@
 [4.1.0]
 - XML config now stores previously generated data
+- Plugin now accepts directory as argument
 
 [4.0.0]
 - Removed Slick dependency, images now generate in headless JVM
