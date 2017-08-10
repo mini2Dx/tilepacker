@@ -137,7 +137,7 @@ public class TilePacker {
 			System.out.println("INFO: Reading " + path);
 			File tileFile = new File(configFileDir, path);
 			if(!tileFile.exists()) {
-				throw new TilePackerException("ERROR: " + path + " does not exist");
+				throw new TilePackerException("ERROR: " + tileFile.getAbsolutePath() + " does not exist");
 			}
 			
 			if(tileConfig.isPlaced()) {
@@ -260,10 +260,6 @@ public class TilePacker {
 	}
 	
 	public static String getRelativePath(File configDirectory, File imageFile) {
-		String configPath = configDirectory.getAbsolutePath();
-		if(!configPath.endsWith("/")) {
-			configPath += "/";
-		}
-		return imageFile.getAbsolutePath().replace(configPath, "");
+		return configDirectory.toURI().relativize(imageFile.toURI()).getPath();
 	}
 }
