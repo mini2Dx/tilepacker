@@ -1,3 +1,6 @@
+[4.1.1]
+- Fix path errors for paths with spaces on Windows
+
 [4.1.0]
 - XML config now stores previously generated data
 - Plugin now accepts directory as argument
