@@ -73,4 +73,4 @@ Optional Configuration Options
 
 Notes
 ---------
-Older integrated graphics cards can only load textures of 512x512 pixels so it is recommended that tilesets are generated at this maximum size.
+Older integrated graphics cards can only load textures of 512x512 pixels so it is recommended that tilesets are generated at this maximum size if you wish to support older cards.
