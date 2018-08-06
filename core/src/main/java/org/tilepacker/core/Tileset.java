@@ -177,15 +177,18 @@ public class Tileset {
 			return;
 		}
 		BufferedImage canvas = new BufferedImage(Tileset.MAX_WIDTH, Tileset.MAX_HEIGHT, BufferedImage.TYPE_INT_ARGB);
-		
+
+		final Color backgroundColor;
 		if (BACKGROUND_COLOR != null && !BACKGROUND_COLOR.isEmpty()) {
 			String[] colorComponents = BACKGROUND_COLOR.split(",");
 			if (colorComponents.length != 3) {
 				throw new TilePackerException("Background color must be in format R,G,B");
 			}
-			Color backgroundColor = new Color(Integer.parseInt(colorComponents[0]), Integer.parseInt(colorComponents[1]),
+			backgroundColor = new Color(Integer.parseInt(colorComponents[0]), Integer.parseInt(colorComponents[1]),
 					Integer.parseInt(colorComponents[2]));
 			drawToImage(canvas, 0, 0, canvas.getWidth(), canvas.getHeight(), backgroundColor.getRGB());
+		} else {
+			backgroundColor = null;
 		}
 
 		for (int i = 0; i < usedRectangles.size(); i++) {
@@ -205,17 +208,17 @@ public class Tileset {
 
 					if (TilePacker.FIX_TEARING) {
 						// Left
-						drawToImage(image.getCutImage(), 0, 0, 1, Tile.HEIGHT, canvas, renderX - 1, renderY);
+						drawToImage(backgroundColor, image.getCutImage(), 0, 0, 1, Tile.HEIGHT, canvas, renderX - 1, renderY);
 						// Right
-						drawToImage(image.getCutImage(), Tile.WIDTH - 1, 0, 1, Tile.HEIGHT, canvas,
+						drawToImage(backgroundColor, image.getCutImage(), Tile.WIDTH - 1, 0, 1, Tile.HEIGHT, canvas,
 								renderX + Tile.WIDTH, renderY);
 						// Top
-						drawToImage(image.getCutImage(), 0, 0, Tile.WIDTH, 1, canvas, renderX, renderY - 1);
+						drawToImage(backgroundColor, image.getCutImage(), 0, 0, Tile.WIDTH, 1, canvas, renderX, renderY - 1);
 						// Bottom
-						drawToImage(image.getCutImage(), 0, Tile.HEIGHT - 1, Tile.WIDTH, 1, canvas, renderX,
+						drawToImage(backgroundColor, image.getCutImage(), 0, Tile.HEIGHT - 1, Tile.WIDTH, 1, canvas, renderX,
 								renderY + Tile.HEIGHT);
 					}
-					drawToImage(image.getCutImage(), 0, 0, Tile.WIDTH, Tile.HEIGHT, canvas, renderX, renderY);
+					drawToImage(backgroundColor, image.getCutImage(), 0, 0, Tile.WIDTH, Tile.HEIGHT, canvas, renderX, renderY);
 					image.dispose();
 				}
 			}
@@ -240,7 +243,7 @@ public class Tileset {
 		saved = true;
 	}
 
-	private void drawToImage(BufferedImage source, int sourceX, int sourceY, int sourceWidth, int sourceHeight,
+	private void drawToImage(Color backgroundColor, BufferedImage source, int sourceX, int sourceY, int sourceWidth, int sourceHeight,
 			BufferedImage destination, int destinationX, int destinationY) {
 		for (int x = sourceX; x < sourceWidth; x++) {
 			if (x < 0) {
@@ -266,7 +269,17 @@ public class Tileset {
 				if (destY >= destination.getHeight()) {
 					continue;
 				}
-				destination.setRGB(destX, destY, source.getRGB(x, y));
+				final int src = source.getRGB(x, y);
+				final double srcA = ((src >> 24) & 0x000000FF) / 255.0;
+
+				if (backgroundColor != null && srcA != 1.0) {
+					if(srcA == 0.0) {
+						continue;
+					}
+					destination.setRGB(destX, destY, src);
+				} else {
+					destination.setRGB(destX, destY, src);
+				}
 			}
 		}
 	}
@@ -291,5 +304,14 @@ public class Tileset {
 				destination.setRGB(x, y, rgb);
 			}
 		}
+	}
+
+	public static int createColor(int r, int g, int b, int a) {
+		int color = 0;
+		color = color | b;
+		color = color | (g <<8);
+		color = color | (r <<16);
+		color = color | (a <<24);
+		return color;
 	}
 }
