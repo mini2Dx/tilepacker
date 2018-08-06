@@ -1,3 +1,6 @@
+[4.1.2]
+- Fix transparent pixels not being handled correctly when background color is used
+
 [4.1.1]
 - Fix path errors for paths with spaces on Windows
 
