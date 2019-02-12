@@ -68,8 +68,9 @@ Optional Configuration Options
 ---------
  * ```tilePadding``` - The padding in pixels to apply around each tile (0 by default)
  * ```preventTearing``` - If you want to prevent tearing when scaling rendering, TilePacker can pad out each tile by its border pixels (false by default)
-  * ```premultiplyAlpha``` - If you want the output image to have premultiplied alpha values (false by default)
-   * ```backgroundColor``` - The background color to use in output images
+ * ```premultiplyAlpha``` - If you want the output image to have premultiplied alpha values (false by default)
+ * ```backgroundColor``` - The background color to use in output images
+ * ```groupTilesByDirectory``` - True if tiles should be grouped into multiple tilesets based on their directory
 
 Notes
 ---------

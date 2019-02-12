@@ -49,6 +49,8 @@ public class TilePackerConfig {
 	private int tilesetHeight = 512;
 	@Element(required=false)
 	private int tilePadding = 0;
+	@Element(required=false)
+	private boolean groupTilesByDirectory = false;
 	@Element
 	private String outputFormat = "PNG";
 	@Element
@@ -64,7 +66,7 @@ public class TilePackerConfig {
 	
 	public boolean containsTileConfig(File tileDirectory, File file) {
 		String pathToLookup = TilePacker.getRelativePath(tileDirectory, file);
-		for(TileConfig config : tiles) {
+		for(TileConfig config : getTiles()) {
 			if(config.getPath().equals(pathToLookup)) {
 				return true;
 			}
@@ -111,7 +113,15 @@ public class TilePackerConfig {
 	public void setTilePadding(int tilePadding) {
 		this.tilePadding = tilePadding;
 	}
-	
+
+	public boolean isGroupTilesByDirectory() {
+		return groupTilesByDirectory;
+	}
+
+	public void setGroupTilesByDirectory(boolean groupTilesByDirectory) {
+		this.groupTilesByDirectory = groupTilesByDirectory;
+	}
+
 	public String getOutputFormat() {
 		return outputFormat;
 	}

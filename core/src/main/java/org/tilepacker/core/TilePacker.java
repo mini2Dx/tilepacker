@@ -28,10 +28,7 @@ package org.tilepacker.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
@@ -52,6 +49,7 @@ public class TilePacker {
 	private final TilePackerConfig config;
 	private final List<TileConfig> inputFiles;
 	private List<Tileset> tilesets;
+	private final Map<String, List<Integer>> tilesetsByDirectory = new HashMap<String, List<Integer>>();
 	
 	/**
 	 * Constructor
@@ -123,8 +121,6 @@ public class TilePacker {
 	}
 	
 	public void run(ClassLoader classLoader) throws IOException {
-		tilesets.add(new Tileset());
-		
 		Queue<TileImage> imagesToPack = new LinkedList<TileImage>();
 
 		for (int i = 0; i < inputFiles.size(); i++) {
@@ -154,50 +150,13 @@ public class TilePacker {
 		}
 		
 		while(!imagesToPack.isEmpty()) {
-			TileImage nextImage = imagesToPack.poll();
-			
-			boolean added = false;
-			
-			if(nextImage.isPlaced()) {
-				while(nextImage.getTileset() >= tilesets.size()) {
-					tilesets.add(new Tileset());
-				}
-				Tileset tileset = tilesets.get(nextImage.getTileset());
-				tileset.add(nextImage);
-				added = true;
-				
-				if (tileset.isFull()) {
-					System.out.println("INFO: Tileset " + nextImage.getTileset() + " is now full. Saving to disk.");
-					tileset.save(new File(TARGET_DIRECTORY, nextImage.getTileset() + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
-				}
-			} else {
-				for (int j = 0; j < tilesets.size(); j++) {
-					Tileset tileset = tilesets.get(j);
+			final TileImage nextImage = imagesToPack.poll();
 
-					if (tileset.add(nextImage)) {
-						nextImage.setTileset(j);
-						added = true;
-						System.out.println("INFO: Added " + nextImage.getTileConfig().getPath() + " to tileset " + j);
-						
-						if (tileset.isFull()) {
-							System.out.println("INFO: Tileset " + j + " is now full. Saving to disk.");
-							tileset.save(new File(TARGET_DIRECTORY, j + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
-						}
-						break;
-					}
-				}
+			final Tileset tileset = getTilesetForTileImage(nextImage);
+			if (tileset.isFull()) {
+				System.out.println("INFO: Tileset " + nextImage.getTileset() + " is now full. Saving to disk.");
+				tileset.save(new File(TARGET_DIRECTORY, nextImage.getTileset() + "." + FORMAT.toLowerCase()).getAbsolutePath(), FORMAT);
 			}
-
-			if (!added) {
-				Tileset tileset = new Tileset();
-				if (!tileset.add(nextImage)) {
-					throw new TilePackerException("ERROR: Tile image too large");
-				}
-				System.out.println("INFO: Added " + nextImage.getTileConfig().getPath() + " to tileset " + tilesets.size());
-				tilesets.add(tileset);
-				nextImage.setTileset(tilesets.size() - 1);
-			}
-			nextImage.storePlacementConfig();
 		}
 		
 		for (int i = 0; i < tilesets.size(); i++) {
@@ -213,6 +172,77 @@ public class TilePacker {
 			serializer.write(config, configFile);
 		} catch (Exception e) {
 			throw new TilePackerException("Error storing placement config", e);
+		}
+	}
+
+	private Tileset getTilesetForTileImage(TileImage nextImage) {
+		if(nextImage.isPlaced()) {
+			while(nextImage.getTileset() >= tilesets.size()) {
+				tilesets.add(new Tileset());
+			}
+			if(config.isGroupTilesByDirectory()) {
+				final String relativeDirectory = TilePacker.getRelativePath(configFileDir.getAbsoluteFile(), nextImage.getFile().getParentFile());
+				if(!tilesetsByDirectory.containsKey(relativeDirectory)) {
+					tilesetsByDirectory.put(relativeDirectory, new ArrayList<Integer>());
+				}
+				final List<Integer> tilesetIndicesForDirectory = tilesetsByDirectory.get(relativeDirectory);
+				if(!tilesetIndicesForDirectory.contains(nextImage.getTileset())) {
+					tilesetIndicesForDirectory.add(nextImage.getTileset());
+				}
+			}
+
+			final Tileset result = tilesets.get(nextImage.getTileset());
+			result.add(nextImage);
+			return result;
+		} else if(config.isGroupTilesByDirectory()) {
+			final String relativeDirectory = TilePacker.getRelativePath(configFileDir.getAbsoluteFile(), nextImage.getFile().getParentFile());
+
+			if(!tilesetsByDirectory.containsKey(relativeDirectory)) {
+				tilesetsByDirectory.put(relativeDirectory, new ArrayList<Integer>());
+			}
+			final List<Integer> tilesetIndicesForDirectory = tilesetsByDirectory.get(relativeDirectory);
+			for (int i = 0; i < tilesetIndicesForDirectory.size(); i++) {
+				final int tilesetIndex = tilesetIndicesForDirectory.get(i);
+				while(tilesetIndex >= tilesets.size()) {
+					tilesets.add(new Tileset());
+				}
+				final Tileset tileset = tilesets.get(tilesetIndex);
+				if (tileset.add(nextImage)) {
+					nextImage.setTileset(tilesetIndex);
+					nextImage.storePlacementConfig();
+					return tileset;
+				}
+			}
+
+			Tileset tileset = new Tileset();
+			if (!tileset.add(nextImage)) {
+				throw new TilePackerException("ERROR: Tile image too large");
+			}
+			tilesets.add(tileset);
+			tilesetIndicesForDirectory.add(tilesets.size() - 1);
+			nextImage.setTileset(tilesets.size() - 1);
+			nextImage.storePlacementConfig();
+			return tileset;
+		} else {
+			for (int j = 0; j < tilesets.size(); j++) {
+				Tileset tileset = tilesets.get(j);
+
+				if (tileset.add(nextImage)) {
+					nextImage.setTileset(j);
+					nextImage.storePlacementConfig();
+					return tileset;
+				}
+			}
+
+			Tileset tileset = new Tileset();
+			if (!tileset.add(nextImage)) {
+				throw new TilePackerException("ERROR: Tile image too large");
+			}
+			System.out.println("INFO: Added " + nextImage.getTileConfig().getPath() + " to tileset " + tilesets.size());
+			tilesets.add(tileset);
+			nextImage.setTileset(tilesets.size() - 1);
+			nextImage.storePlacementConfig();
+			return tileset;
 		}
 	}
 	

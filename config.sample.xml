@@ -4,6 +4,7 @@
    <tilesetWidth>512</tilesetWidth>
    <tilesetHeight>512</tilesetHeight>
    <tilePadding>2</tilePadding>
+   <groupTilesByDirectory>false</groupTilesByDirectory>
    <outputFormat>PNG</outputFormat>
    <outputPath>../core/assets/maps</outputPath>
    <preventTearing>true</preventTearing>
