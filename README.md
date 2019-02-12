@@ -13,7 +13,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-		classpath 'org.mini2Dx:tilepacker-gradle-plugin:4.1.1'
+		classpath 'org.mini2Dx:tilepacker-gradle-plugin:4.2.0'
     }
 }
 ```
