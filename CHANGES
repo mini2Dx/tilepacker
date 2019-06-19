@@ -1,4 +1,7 @@
-[4.2.0-SNAPSHOT]
+[4.2.1]
+- Fix existing folder-based configs being removed when a tile is removed
+
+[4.2.0]
 - Add support for grouping tiles by directory into multiple tilesets
 
 [4.1.2]
