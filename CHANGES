@@ -1,3 +1,5 @@
+[4.2.2-SNAPSHOT]
+
 [4.2.1]
 - Fix existing folder-based configs being removed when a tile is removed
 
