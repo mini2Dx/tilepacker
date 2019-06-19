@@ -192,6 +192,7 @@ public class TilePacker {
 			}
 
 			final Tileset result = tilesets.get(nextImage.getTileset());
+			nextImage.storePlacementConfig();
 			result.add(nextImage);
 			return result;
 		} else if(config.isGroupTilesByDirectory()) {
