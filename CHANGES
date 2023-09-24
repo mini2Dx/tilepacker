@@ -1,5 +1,6 @@
 [5.0.0-SNAPSHOT]
 - Upgrade to Gradle 8.3
+- Fix handling of images whose width/height aren't aligned to tile width/height
 
 [4.2.1]
 - Fix existing folder-based configs being removed when a tile is removed

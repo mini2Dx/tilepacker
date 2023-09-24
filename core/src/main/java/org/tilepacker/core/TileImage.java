@@ -36,8 +36,8 @@ public class TileImage {
 		placement = new TilePlacement();
 		placement.setSubImageX(0);
 		placement.setSubImageY(0);
-		placement.setSubImageWidth(widthInPixels / Tile.WIDTH);
-		placement.setSubImageHeight(heightInPixels / Tile.HEIGHT);
+		placement.setSubImageWidth((widthInPixels + Tile.WIDTH - 1) / Tile.WIDTH);
+		placement.setSubImageHeight((heightInPixels + Tile.HEIGHT - 1) / Tile.HEIGHT);
 
 		dispose();
 	}
@@ -86,8 +86,20 @@ public class TileImage {
 			}
 		} else {
 			parent.loadImage();
-			cutImage = parent.getOriginalImage().getSubimage(placement.getSubImageX() * Tile.WIDTH, placement.getSubImageY() * Tile.HEIGHT,
-					placement.getSubImageWidth() * Tile.WIDTH, placement.getSubImageHeight() * Tile.HEIGHT);
+
+			int x = placement.getSubImageX() * Tile.WIDTH;
+			int y = placement.getSubImageY() * Tile.HEIGHT;
+			int width = placement.getSubImageWidth() * Tile.WIDTH;
+			int height = placement.getSubImageHeight() * Tile.HEIGHT;
+
+			if(x + width > parent.widthInPixels) {
+				width = parent.widthInPixels - x;
+			}
+			if(y + height > parent.heightInPixels) {
+				height = parent.heightInPixels - y;
+			}
+
+			cutImage = parent.getOriginalImage().getSubimage(x, y, width, height);
 			parent.dispose();
 		}
 	}

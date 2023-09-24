@@ -84,6 +84,7 @@ public class TilePacker {
 			config = new TilePackerConfig();
 			config.setTiles(new ArrayList<TileConfig>());
 		}
+
 		findTileFiles(config, this.configFileDir);
 
 		Tile.WIDTH = config.getTileWidth();
@@ -102,6 +103,11 @@ public class TilePacker {
 		}
 		TilePacker.FORMAT = config.getOutputFormat();
 		TilePacker.TARGET_DIRECTORY = new File(configFile.getParent(), config.getOutputPath());
+
+		if(!TilePacker.TARGET_DIRECTORY.exists()) {
+			TilePacker.TARGET_DIRECTORY.mkdirs();
+		}
+
 		inputFiles = config.getTiles();
 	}
 	
