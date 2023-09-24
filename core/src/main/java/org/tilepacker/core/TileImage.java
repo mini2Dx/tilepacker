@@ -92,11 +92,11 @@ public class TileImage {
 			int width = placement.getSubImageWidth() * Tile.WIDTH;
 			int height = placement.getSubImageHeight() * Tile.HEIGHT;
 
-			if(x + width > parent.widthInPixels) {
-				width = parent.widthInPixels - x;
+			if(x + width > parent.getOriginalImage().getWidth()) {
+				width = parent.getOriginalImage().getWidth() - x;
 			}
-			if(y + height > parent.heightInPixels) {
-				height = parent.heightInPixels - y;
+			if(y + height > parent.getOriginalImage().getHeight()) {
+				height = parent.getOriginalImage().getHeight() - y;
 			}
 
 			cutImage = parent.getOriginalImage().getSubimage(x, y, width, height);
