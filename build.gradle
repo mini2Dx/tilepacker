@@ -38,7 +38,7 @@ subprojects {
 	}
 	
 	group = 'org.mini2Dx'
-	version = '5.0.0'
+	version = '5.0.1'
 
 	java {
 		sourceCompatibility = 1.7
@@ -121,7 +121,7 @@ project(":" + rootProject.name + "-core") {
 
 project(":" + rootProject.name + "-gradle-plugin") {
 	apply plugin: 'groovy'
-	
+
 	dependencies {
 		implementation project(":" + rootProject.name + "-core")
 		implementation gradleApi()
