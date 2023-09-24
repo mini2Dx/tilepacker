@@ -4,90 +4,66 @@ buildscript {
 	repositories {
 		mavenLocal()
 		mavenCentral()
-		jcenter()
+		gradlePluginPortal()
 	}
 	dependencies {
-		classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
-		classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.9.0'
+		classpath 'com.github.johnrengelman:shadow:8.1.1'
 	}
 }
 
 if(project.hasProperty('ossrhUser') && project.hasProperty("release")) {
-	apply plugin: "io.codearte.nexus-staging"
+	plugins {
+		id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
+	}
 
-	nexusStaging {
-		packageGroup = 'org.mini2Dx'
-		username = ossrhUser
-		password = ossrhPassword
+	nexusPublishing {
+		repositories {
+			sonatype {
+				username = ossrhUser
+				password = ossrhPassword
+			}
+		}
 	}
 }
 
 subprojects {
-	apply plugin: "java"
+	apply plugin: "java-library"
 	apply plugin: "signing"
-	apply plugin: "maven"
+	apply plugin: "maven-publish"
 	
 	repositories {
 		mavenLocal()
 		mavenCentral()
-		maven { url "https://mini2dx.org/maven/content/repositories/thirdparty" }
 	}
 	
 	group = 'org.mini2Dx'
-	version = '4.2.2-SNAPSHOT'
-	
-	sourceCompatibility = 1.7
-	targetCompatibility = 1.7
-	
-	task javadocJar(type: Jar) {
-		classifier = 'javadoc'
-		from javadoc
-	}
+	version = '5.0.0-SNAPSHOT'
 
-	task sourcesJar(type: Jar) {
-		classifier = 'sources'
-		from sourceSets.main.allSource
-	}
-	
-	artifacts {
-		archives javadocJar, sourcesJar
+	java {
+		sourceCompatibility = 1.7
+		targetCompatibility = 1.7
+
+		withJavadocJar()
+		withSourcesJar()
 	}
 	
 	// Maven Central publication
 	if(project.hasProperty('ossrhUser')) {
-		signing {
-			sign configurations.archives
-		}
-		
-		uploadArchives {
-			repositories {
-				mavenDeployer {
-					// POM signature
-					beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-					// Target repository
-					repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-						authentication(userName: ossrhUser, password: ossrhPassword)
-					}
-					pom.project {
-						name project.name
-						description project.description
-						packaging 'jar'
-						url 'https://github.com/mini2Dx/tilepacker'
-	
-						scm {
-							connection 'scm:git:https://github.com/mini2Dx/tilepacker.git'
-							developerConnection 'scm:git:git@github.com:mini2Dx/tilepacker.git'
-							url 'https://github.com/mini2Dx/tilepacker.git'
-						}
-	
+		publishing {
+			publications {
+				mavenJava(MavenPublication) {
+					from(components.java)
+
+					pom {
+						name = project.name
+						description = project.description
+						url = 'https://github.com/mini2Dx/tilepacker'
 						licenses {
 							license {
-								name 'The BSD 3-Clause License'
-								url 'https://opensource.org/licenses/BSD-3-Clause'
-								distribution 'repo'
+								name = 'The BSD 3-Clause License'
+								url = 'https://opensource.org/licenses/BSD-3-Clause'
 							}
 						}
-	
 						developers {
 							developer {
 								id = 'tomcashman'
@@ -95,9 +71,18 @@ subprojects {
 								email = 'thomascashman404@gmail.com'
 							}
 						}
+						scm {
+							connection = 'scm:git:https://github.com/mini2Dx/tilepacker.git'
+							developerConnection = 'scm:git:git@github.com:mini2Dx/tilepacker.git'
+							url = 'https://github.com/mini2Dx/tilepacker.git'
+						}
 					}
 				}
 			}
+		}
+
+		signing {
+			sign publishing.publications.mavenJava
 		}
 	}
 }
@@ -105,39 +90,46 @@ subprojects {
 project(":" + rootProject.name + "-core") {
 	apply plugin: 'application'
 	apply plugin: 'com.github.johnrengelman.shadow'
-	
-	mainClassName = "org.tilepacker.core.TilePacker"
+
+	application {
+		mainClass = "org.tilepacker.core.TilePacker"
+	}
 	
 	dependencies {
-		compile 'org.simpleframework:simple-xml:2.7.1'
-		compile fileTree(dir: 'lib', include: ['*.jar'])
+		implementation 'org.simpleframework:simple-xml:2.7.1'
+		implementation fileTree(dir: 'lib', include: ['*.jar'])
 	
-		testCompile 'org.jmock:jmock-junit4:2.5.1'
-		testCompile 'org.jmock:jmock-legacy:2.5.1'
-		testCompile 'junit:junit:4.8.2'
+		testImplementation 'org.jmock:jmock-junit4:2.5.1'
+		testImplementation 'org.jmock:jmock-legacy:2.5.1'
+		testImplementation 'junit:junit:4.8.2'
 	}
 	
 	shadowJar {
-		baseName = rootProject.name + "-core"
-		classifier = ''
+		archiveBaseName.set(rootProject.name + "-core")
+		archiveClassifier.set('')
 		dependencies {
 			exclude(dependency('org.simpleframework:simple-xml:2.7.1'))
 		}
 	}
 	
 	assemble.dependsOn shadowJar
+	distTar.dependsOn shadowJar
+	startScripts.dependsOn shadowJar
+	startShadowScripts.dependsOn jar
 }
 
 project(":" + rootProject.name + "-gradle-plugin") {
 	apply plugin: 'groovy'
 	
 	dependencies {
-		compile project(":" + rootProject.name + "-core")
-		compile gradleApi()
-		compile localGroovy()
-	
-		testCompile 'org.jmock:jmock-junit4:2.5.1'
-		testCompile 'org.jmock:jmock-legacy:2.5.1'
-		testCompile 'junit:junit:4.8.2'
+		implementation project(":" + rootProject.name + "-core")
+		implementation gradleApi()
+		implementation localGroovy()
+
+		testImplementation 'org.jmock:jmock-junit4:2.5.1'
+		testImplementation 'org.jmock:jmock-legacy:2.5.1'
+		testImplementation 'junit:junit:4.8.2'
 	}
+
+	compileGroovy.dependsOn(":" + rootProject.name + "-core:shadowJar")
 }

@@ -27,6 +27,7 @@
 package org.tilepacker.core;
 
 import java.io.File;
+import java.nio.file.Files;
 
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
@@ -38,9 +39,8 @@ import org.simpleframework.xml.core.Persister;
 public class TilePackerTestUtils {
 
 	public static File createTestConfigFile(TilePackerConfig tilePackerConfig) throws Exception {
-		File tmpFile = File.createTempFile(TilePackerTestUtils.class.getSimpleName(), ".xml");
-		File configFile = new File(tmpFile.getParent(), "config.xml");
-		tmpFile.renameTo(configFile);
+		File tmpDir = Files.createTempDirectory("tilepacker").toFile();
+		File configFile = new File(tmpDir, "config.xml");
 		Serializer serializer = new Persister();
 		serializer.write(tilePackerConfig, configFile);
 		return configFile;

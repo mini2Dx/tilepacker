@@ -26,6 +26,11 @@
  */
 package org.tilepacker.gradle
 
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+
 import java.awt.SystemTray
 import java.awt.TrayIcon
 import java.util.Set;
@@ -37,13 +42,15 @@ import org.tilepacker.core.TilePacker
 /**
  *
  */
-class TilePackerTask extends DefaultTask {
-	File tilesDirectory;
-	boolean rewrite;
+abstract class TilePackerTask extends DefaultTask {
+	@InputDirectory
+	abstract DirectoryProperty getTilesDirectory();
+	@Input
+	abstract Property<Boolean> getRewrite();
 
 	@TaskAction
 	def packTiles() {
-		TilePacker tilePacker = new TilePacker(tilesDirectory, rewrite);
+		TilePacker tilePacker = new TilePacker(tilesDirectory.get().asFile, rewrite.get());
 		tilePacker.run(getClass().classLoader);
 	}
 }
