@@ -1,0 +1,1 @@
+.\gradlew -Prelease publishToSonatype closeAndReleaseSonatypeStagingRepository

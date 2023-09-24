@@ -8,17 +8,17 @@ buildscript {
 	}
 	dependencies {
 		classpath 'com.github.johnrengelman:shadow:8.1.1'
+		classpath 'io.github.gradle-nexus:publish-plugin:1.3.0'
 	}
 }
 
 if(project.hasProperty('ossrhUser') && project.hasProperty("release")) {
-	plugins {
-		id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
-	}
+	apply plugin: "io.github.gradle-nexus.publish-plugin"
 
 	nexusPublishing {
 		repositories {
 			sonatype {
+				packageGroup = 'org.mini2Dx'
 				username = ossrhUser
 				password = ossrhPassword
 			}
@@ -30,14 +30,15 @@ subprojects {
 	apply plugin: "java-library"
 	apply plugin: "signing"
 	apply plugin: "maven-publish"
-	
+
 	repositories {
 		mavenLocal()
 		mavenCentral()
+		gradlePluginPortal()
 	}
 	
 	group = 'org.mini2Dx'
-	version = '5.0.0-SNAPSHOT'
+	version = '5.0.0'
 
 	java {
 		sourceCompatibility = 1.7
@@ -56,7 +57,7 @@ subprojects {
 
 					pom {
 						name = project.name
-						description = project.description
+						description = "Utility for packing images into a tilesheet"
 						url = 'https://github.com/mini2Dx/tilepacker'
 						licenses {
 							license {
